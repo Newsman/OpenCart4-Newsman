@@ -1,6 +1,6 @@
-# OpenCart 3 - Newsman Newsletter Sync
+# OpenCart 4 - Newsman Newsletter Sync
 
-NewsMAN Plugin for OpenCart 3 facilitates seamless synchronization of your OpenCart customers and subscribers with [Newsman](https://www.newsmanapp.com) lists and segments. Simplify the connection between your shop and NewsMAN by generating an API KEY in your NewsMAN account and installing this plugin. This process allows you to effortlessly sync customer and newsletter subscriber data.
+NewsMAN Plugin for OpenCart 4 facilitates seamless synchronization of your OpenCart customers and subscribers with [Newsman](https://www.newsmanapp.com) lists and segments. Simplify the connection between your shop and NewsMAN by generating an API KEY in your NewsMAN account and installing this plugin. This process allows you to effortlessly sync customer and newsletter subscriber data.
 
 ![image](https://raw.githubusercontent.com/Newsman/OpenCart2.3-Newsman/master/assets/newsmanBr.jpg)
 
@@ -9,7 +9,7 @@ NewsMAN Plugin for OpenCart 3 facilitates seamless synchronization of your OpenC
 ## Newsman Sync
 
 Manual installation:
-1. Copy the contents of the src folder and paste them into your OpenCart 3 root directory.
+1. Copy the contents of the src folder and paste them into your OpenCart 4 root directory.
 2. Navigate to admin -> Extensions -> Extension -> Choose extension type -> Modules -> Install the NewsMAN Newsletter Sync module.
 3. After installation, edit the NewsMAN Newsletter Sync module.
 
@@ -45,7 +45,7 @@ Upon installation, the plugin provides feed products and events (product impress
 
 Description
 
-The NewsMAN Plugin for OpenCart 3 empowers you to streamline email and SMS marketing efforts, offering features like subscription forms, contact list management, newsletters, email campaigns, SMS functionalities, smart automations, and detailed analytics. Access these capabilities through the NewsMAN platform for enhanced marketing efficiency.
+The NewsMAN Plugin for OpenCart 4 empowers you to streamline email and SMS marketing efforts, offering features like subscription forms, contact list management, newsletters, email campaigns, SMS functionalities, smart automations, and detailed analytics. Access these capabilities through the NewsMAN platform for enhanced marketing efficiency.
 
 Key Features:
 
