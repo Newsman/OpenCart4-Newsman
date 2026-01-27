@@ -1,0 +1,97 @@
+{{ header }}{{ column_left }}
+<div id="content">
+    <div class="page-header">
+        <div class="container-fluid">
+            <div class="float-end">
+                <button type="submit" form="form-analytics" data-bs-toggle="tooltip" title="{{ button_save }}"
+                        class="btn btn-primary"><i class="fa-solid fa-save"></i></button>
+                <a href="{{ cancel }}" data-bs-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-light"><i
+                            class="fa-solid fa-reply"></i></a></div>
+            <h1>{{ heading_title }}</h1>
+            <ol class="breadcrumb">
+                {% for breadcrumb in breadcrumbs %}
+                    <li class="breadcrumb-item"><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+                {% endfor %}
+            </ol>
+            |&nbsp;<a href="{{ url_newsman_settings }}" title="{{ text_newsman_settings }}">{{ text_newsman_settings }}</a>
+        </div>
+    </div>
+    <div class="container-fluid">
+        {% if error_warning %}
+            <div class="alert alert-danger alert-dismissible" role="alert"><i
+                        class="fa-solid fa-exclamation-circle"></i> {{ error_warning }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endif %}
+        <div class="card">
+            <div class="card-header">
+                <i class="fa-solid fa-pencil"></i> {{ text_edit }}
+            </div>
+            <div class="card-body">
+                <form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-analytics">
+                    <div class="alert alert-info alert-dismissible" role="alert"><i class="fa-solid fa-info-circle"></i> {{ text_signup }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                    <div class="row mb-3">
+                        <label class="col-sm-2 col-form-label" for="input-remarketing-status">
+                            <span data-bs-toggle="tooltip" title="{{ text_remarketing_id_hint }}">{{ text_remarketing_id_status }}</span>
+                        </label>
+                        <div class="col-sm-10">
+                            <div class="col-form-label text-start">
+                                {% if is_remarketing_connected %}
+                                    <strong style="color: #40826D;">{{ text_remarketing_id_valid }}</strong>
+                                {% else %}
+                                    <strong style="color: #D2042D;">{{ text_remarketing_id_invalid }}</strong>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label class="col-sm-2 col-form-label" for="input-code">{{ entry_tracking }}</label>
+                        <div class="col-sm-10">
+                            <input name="analytics_newsmanremarketing_trackingid" placeholder="{{ entry_tracking }}"
+                                   id="input-code" class="form-control"
+                                   value="{{ analytics_newsmanremarketing_trackingid }}">
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label class="col-sm-2 col-form-label" for="input-status">{{ entry_status }}</label>
+                        <div class="col-sm-10">
+                            <div class="form-check form-switch form-switch-lg">
+                                <input type="hidden" name="analytics_newsmanremarketing_status" value="0"/>
+                                <input type="checkbox" name="analytics_newsmanremarketing_status" value="1" id="input-status" class="form-check-input"{% if analytics_newsmanremarketing_status %} checked{% endif %}/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label class="col-sm-2 col-form-label" for="input-anonymize-ip">{{ entry_anonymize_ip }}</label>
+                        <div class="col-sm-10">
+                            <div class="form-check form-switch form-switch-lg">
+                                <input type="hidden" name="analytics_newsmanremarketing_anonymize_ip" value="0"/>
+                                <input type="checkbox" name="analytics_newsmanremarketing_anonymize_ip" value="1" id="input-anonymize-ip" class="form-check-input"{% if analytics_newsmanremarketing_anonymize_ip %} checked{% endif %}/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label class="col-sm-2 col-form-label" for="input-send-telephone">{{ entry_send_telephone }}</label>
+                        <div class="col-sm-10">
+                            <div class="form-check form-switch form-switch-lg">
+                                <input type="hidden" name="analytics_newsmanremarketing_send_telephone" value="0"/>
+                                <input type="checkbox" name="analytics_newsmanremarketing_send_telephone" value="1" id="input-send-telephone" class="form-check-input"{% if analytics_newsmanremarketing_send_telephone %} checked{% endif %}/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label class="col-sm-2 col-form-label" for="input-code">{{ entry_order_date }}</label>
+                        <div class="col-sm-10">
+                            <input name="analytics_newsmanremarketing_order_date" placeholder="{{ entry_order_date }}"
+                                   id="input-code" class="form-control"
+                                   value="{{ analytics_newsmanremarketing_order_date }}">
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{{ footer }}

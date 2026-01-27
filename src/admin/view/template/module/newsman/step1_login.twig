@@ -1,0 +1,58 @@
+{{ header }}{{ column_left }}
+<div id="content">
+    <div class="page-header">
+        <div class="container-fluid">
+            <h1>{{ heading_title }}</h1>
+            <ol class="breadcrumb">
+                {% for breadcrumb in breadcrumbs %}
+                    <li class="breadcrumb-item"><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+                {% endfor %}
+            </ol>
+        </div>
+    </div>
+
+    <div class="container-fluid">
+        <div id="alerts">
+            {% if success %}
+                <div class="alert alert-success alert-dismissible" role="alert">
+                    <i class="fa-solid fa-check-circle" aria-hidden="true"></i>&nbsp;{{ success }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{{ text_close }}"></button>
+                </div>
+            {% endif %}
+            {% if error %}
+                <div class="alert alert-danger alert-dismissible" role="alert">
+                    <i class="fa-solid fa-exclamation-triangle" aria-hidden="true"></i>&nbsp;{{ error }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{{ text_close }}"></button>
+                </div>
+            {% endif %}
+            {% if warning %}
+                <div class="alert alert-warning alert-dismissible" role="alert">
+                    <i class="fa-solid fa-info-circle"></i>&nbsp;{{ warning }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-header"><i class="fa-solid fa-circle-info"></i> {{ text_step1_connect }}</div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item"><i class="fa-solid fa-sync text-primary me-2"></i> {{ text_step1_sync }}</li>
+                    <li class="list-group-item"><i class="fa-solid fa-chart-line text-primary me-2"></i> {{ text_step1_remarketing }}</li>
+                    <li class="list-group-item"><i class="fa-solid fa-file-lines text-primary me-2"></i> {{ text_step1_forms }}</li>
+                    <li class="list-group-item"><i class="fa-solid fa-window-maximize text-primary me-2"></i> {{ text_step1_popups }}</li>
+                    <li class="list-group-item"><i class="fa-solid fa-robot text-primary me-2"></i> {{ text_step1_automation }}</li>
+                </ul>
+                <div class="mt-4">
+                    <a style="background: #ad0100" href="{{ oauth_url }}" class="btn btn-primary btn-lg">{{ button_login }}</a>
+                    {% if newsman_api_key is not empty and newsman_user_id is not empty %}
+                        <a href="{{ back }}" class="btn btn-light btn-lg ms-2">{{ button_cancel }}</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{{ footer }}

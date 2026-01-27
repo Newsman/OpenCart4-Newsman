@@ -1,0 +1,459 @@
+<?php
+
+namespace Newsman;
+
+/**
+ * Setup class
+ *
+ * @property \Newsman\Nzmconfig                      $nzmconfig
+ * @property \Opencart\System\Engine\Loader          $load
+ * @property \Opencart\Admin\Model\Extension\Newsman\Setting $model_extension_newsman_setting
+ * @property \Opencart\Admin\Model\Setting\Event     $model_setting_event
+ * @property \Opencart\Admin\Model\Setting\Setting   $model_setting_setting
+ */
+class Nzmsetup extends \Newsman\Library {
+	/**
+	 * The current version of setup in this file.
+	 * The version should or must be in the database after setup execution.
+	 *
+	 * @var string
+	 */
+	protected $setup_version = '1.0.0';
+
+	/**
+	 * @param \Opencart\System\Engine\Registry $registry
+	 */
+	public function __construct($registry) {
+		parent::__construct($registry);
+
+		if (!$this->registry->has('nzmconfig')) {
+			$this->registry->set('nzmconfig', new \Newsman\Nzmconfig($this->registry));
+		}
+	}
+
+	/**
+	 * Install handler
+	 *
+	 * @return void
+	 */
+	public function install() {
+		$this->load->model('extension/newsman/setting');
+		$this->model_extension_newsman_setting = $this->registry->get('model_extension_newsman_setting');
+		$this->load->model('setting/setting');
+		$this->load->model('setting/event');
+		$this->model_setting_event = $this->registry->get('model_setting_event');
+
+		$setting['module_newsman_status'] = 1;
+		$this->model_extension_newsman_setting->editSetting('module_newsman', $setting);
+
+		$this->setup();
+	}
+
+	/**
+	 * Upgrade handler
+	 *
+	 * @return void
+	 */
+	public function upgrade() {
+		$this->load->model('extension/newsman/setting');
+		$this->model_extension_newsman_setting = $this->registry->get('model_extension_newsman_setting');
+		$this->load->model('setting/setting');
+		$this->load->model('setting/event');
+		$this->model_setting_event = $this->registry->get('model_setting_event');
+
+		$update = false;
+		foreach ($this->nzmconfig->getAllStoreIds() as $store_id) {
+			if ($this->nzmconfig->isActive($store_id)) {
+				if (!empty($this->getCurrentVersion($store_id)) && $this->getCurrentVersion($store_id) === $this->setup_version) {
+					continue;
+				}
+				$update = true;
+				break;
+			}
+		}
+		if (!$update) {
+			return;
+		}
+
+		$this->setup();
+	}
+
+	/**
+	 * Uninstall handler
+	 *
+	 * @return void
+	 */
+	public function uninstall() {
+		$this->load->model('extension/newsman/setting');
+		$this->model_extension_newsman_setting = $this->registry->get('model_extension_newsman_setting');
+		$this->load->model('setting/setting');
+		$this->load->model('setting/event');
+		$this->model_setting_event = $this->registry->get('model_setting_event');
+
+		$this->model_setting_setting->deleteSetting('newsman');
+
+		$this->model_setting_event->deleteEventByCode('newsman_upgrade_setup_sale_order_info');
+		$this->model_setting_event->deleteEventByCode('newsman_upgrade_setup_catalog_product_form');
+		$this->model_setting_event->deleteEventByCode('newsman_upgrade_setup_dashboard');
+		$this->model_setting_event->deleteEventByCode('newsman_upgrade_setup_module');
+
+		$this->model_setting_event->deleteEventByCode('newsman_clean_logs_sale_order_info');
+		$this->model_setting_event->deleteEventByCode('newsman_clean_logs_catalog_product_form');
+		$this->model_setting_event->deleteEventByCode('newsman_clean_logs_dashboard');
+		$this->model_setting_event->deleteEventByCode('newsman_clean_logs_module');
+
+		$this->model_setting_event->deleteEventByCode('newsman_checkout_order_add_after');
+		$this->model_setting_event->deleteEventByCode('newsman_api_order_after');
+
+		$this->model_setting_event->deleteEventByCode('newsman_account_newsletter_save_before');
+		$this->model_setting_event->deleteEventByCode('newsman_account_register_after');
+		$this->model_setting_event->deleteEventByCode('newsman_checkout_register_save_after');
+
+		$this->model_setting_event->deleteEventByCode('newsman_checkout_success_before');
+
+		$this->model_setting_event->deleteEventByCode('newsman_admin_customer_edit_before');
+		$this->model_setting_event->deleteEventByCode('newsman_admin_customer_delete_before');
+		$this->model_setting_event->deleteEventByCode('newsman_catalog_cron_gdpr_before');
+	}
+
+	/**
+	 * Perform setup install or upgrade.
+	 *
+	 * @return void
+	 */
+	protected function setup($network_wide = false) {
+		foreach ($this->nzmconfig->getAllStoreIds() as $store_id) {
+			$this->upgradeEvents($store_id);
+			$this->upgradeOptions($store_id);
+		}
+	}
+
+	/**
+	 * Upgrade events.
+	 *
+	 * @param int $store_id
+	 *
+	 * @return void
+	 */
+	protected function upgradeEvents($store_id) {
+		$current_version = $this->getCurrentVersion($store_id);
+
+		if (version_compare($current_version, '1.0.0', '<')) {
+			$this->upgradeEventsOneZeroZero($store_id);
+		}
+	}
+
+	/**
+	 * Upgrade admin settings.
+	 * @note This function should be run last because the newsman_setup_version setting is updated.
+	 *
+	 * @param int $store_id
+	 *
+	 * @return void
+	 */
+	protected function upgradeOptions($store_id) {
+		$current_version = $this->getCurrentVersion($store_id);
+
+		if (version_compare($current_version, '1.0.0', '<')) {
+			$this->upgradeOptionsOneZeroZero($store_id);
+			$this->model_extension_newsman_setting->editSetting(
+				'newsman',
+				array('newsman_setup_version' => '1.0.0'),
+				$store_id
+			);
+		}
+	}
+
+	/**
+	 * Upgrade admin settings 1.0.0
+	 *
+	 * @param int $store_id
+	 *
+	 * @return void
+	 */
+	protected function upgradeOptionsOneZeroZero($store_id) {
+		$this->load->model('extension/newsman/setting');
+		$this->model_extension_newsman_setting = $this->registry->get('model_extension_newsman_setting');
+
+		$data = array();
+		$data['newsman_api_url'] = 'https://ssl.newsman.app/api/';
+		$data['newsman_api_version'] = '1.2';
+		$data['newsman_send_user_ip'] = 1;
+		$data['newsman_developer_active_user_ip'] = 0;
+		$data['newsman_developer_user_ip'] = '';
+		$data['newsman_newsletter_double_optin'] = 0;
+		$data['newsman_developer_log_severity'] = 400;
+		$data['newsman_developer_log_clean_days'] = 60;
+		$data['newsman_developer_api_timeout'] = 10;
+		$data['newsman_oauth_url'] = 'https://newsman.app/admin/oauth/authorize?response_type=code&client_id=nzmplugin&nzmplugin=Opencart&scope=api&redirect_uri=__redirect_url__';
+		$data['newsman_oauth_token_url'] = 'https://newsman.app/admin/oauth/token';
+
+		$this->model_extension_newsman_setting->editSetting(
+			'newsman',
+			$data,
+			$store_id
+		);
+
+		$migrate_settings = array(
+			'newsmanuserid'  => 'newsman_user_id',
+			'newsmanapikey'  => 'newsman_api_key',
+			'newsmanlistid'  => 'newsman_list_id',
+			'newsmansegment' => 'newsman_segment',
+		);
+		foreach ($migrate_settings as $old_setting => $new_setting) {
+			$old_value = $this->model_setting_setting->getValue($old_setting, $store_id);
+			if (empty($old_value)) {
+				$old_value = '';
+			}
+			$new_value = $this->model_setting_setting->getValue($new_setting, $store_id);
+			if (empty($new_value)) {
+				$this->model_extension_newsman_setting->editSetting('newsman', array($new_setting => $old_value), $store_id);
+				$this->model_extension_newsman_setting->deleteSettingByKey('newsman', $old_setting, $store_id);
+			}
+		}
+
+		$data = array();
+		$data['analytics_newsmanremarketing_status'] = 1;
+		$data['analytics_newsmanremarketing_anonymize_ip'] = 0;
+		$data['analytics_newsmanremarketing_send_telephone'] = 1;
+		$data['analytics_newsmanremarketing_tracking_script_url'] = 'https://retargeting.newsmanapp.com/js/retargeting/track.js';
+		$data['analytics_newsmanremarketing_http_resource_url'] = 'https://retargeting.newsmanapp.com/';
+		$data['analytics_newsman_remarketing_http_tracking_url'] = 'https://rtrack.newsmanapp.com/';
+
+		$data['analytics_newsmanremarketing_http_required_file_patterns'] = 'js/retargeting/track.js
+js/retargeting/nzm_custom_{{api_key}}.js
+js/retargeting/ecommerce.js
+js/retargeting/modal_{{api_key}}.js';
+
+		$data['analytics_newsmanremarketing_script_js'] = "var _nzm = _nzm || [],
+    _nzm_config = _nzm_config || [];
+
+{{nzmConfigJs}}
+
+(function(w, d, e, u, f, c, l, n, a, m) {
+    w[f] = w[f] || [],
+    w[c] = w[c] || [],
+    a=function(x) {
+        return function() {
+            w[f].push([x].concat(Array.prototype.slice.call(arguments, 0)));
+        }
+    },
+    m = [\"identify\", \"track\", \"run\"];
+    if ({{conditionTunnelScript}}) {
+        w[c].js_prefix = '{{resourcesBaseUrl}}';
+        w[c].tr_prefix = '{{trackingBaseUrl}}';
+    }
+    for(var i = 0; i < m.length; i++) {
+        w[f][m[i]] = a(m[i]);
+    }
+    l = d.createElement(e),
+    l.async = 1,
+    l.src = u,
+    l.id=\"nzm-tracker\",
+    l.setAttribute(\"data-site-id\", '{{remarketingId}}'),
+    n = d.getElementsByTagName(e)[0],
+    n.parentNode.insertBefore(l, n);
+
+})(window, document, 'script', '{{trackingScriptUrl}}', '_nzm', '_nzm_config');";
+
+		$data['analytics_newsmanremarketing_js_track_run_func'] = '_nzm.run';
+
+		$current_date = new \DateTime();
+		$current_date->modify('-5 years');
+		$data['analytics_newsmanremarketing_order_date'] = $current_date->format('Y-m-d');
+
+		$this->model_extension_newsman_setting->editSetting(
+			'analytics_newsmanremarketing',
+			$data,
+			$store_id
+		);
+
+		$this->load->model('setting/event');
+	}
+
+	/**
+	 * Upgrade events 1.0.0
+	 *
+	 * @param int $store_id
+	 *
+	 * @return void
+	 */
+	protected function upgradeEventsOneZeroZero($store_id) {
+		$this->load->model('setting/event');
+		$this->model_setting_event = $this->registry->get('model_setting_event');
+
+		$this->model_setting_event->deleteEventByCode('newsman_upgrade_setup_sale_order_info');
+		$this->model_setting_event->addEvent([
+			'code'        => 'newsman_upgrade_setup_sale_order_info',
+			'description' => 'Newsman setup upgrade on sale order view',
+			'trigger'     => 'admin/view/sale/order_info/before',
+			'action'      => 'extension/newsman/module/newsman.eventSetupUpgrade',
+			'status'      => 1,
+			'sort_order'  => 1
+		]);
+		$this->model_setting_event->deleteEventByCode('newsman_upgrade_setup_catalog_product_form');
+		$this->model_setting_event->addEvent([
+			'code'        => 'newsman_upgrade_setup_catalog_product_form',
+			'description' => 'Newsman setup upgrade on catalog product view',
+			'trigger'     => 'admin/view/catalog/product_form/before',
+			'action'      => 'extension/newsman/module/newsman.eventSetupUpgrade',
+			'status'      => 1,
+			'sort_order'  => 1
+		]);
+		$this->model_setting_event->deleteEventByCode('newsman_upgrade_setup_dashboard');
+		$this->model_setting_event->addEvent([
+			'code'        => 'newsman_upgrade_setup_dashboard',
+			'description' => 'Newsman setup upgrade on dashboard view',
+			'trigger'     => 'admin/view/common/dashboard/before',
+			'action'      => 'extension/newsman/module/newsman.eventSetupUpgrade',
+			'status'      => 1,
+			'sort_order'  => 1
+		]);
+		$this->model_setting_event->deleteEventByCode('newsman_upgrade_setup_module');
+		$this->model_setting_event->addEvent([
+			'code'        => 'newsman_upgrade_setup_module',
+			'description' => 'Newsman setup upgrade on module view',
+			'trigger'     => 'admin/view/extension/newsman/module/newsman/before',
+			'action'      => 'extension/newsman/module/newsman.eventSetupUpgrade',
+			'status'      => 1,
+			'sort_order'  => 1
+		]);
+
+		$this->model_setting_event->deleteEventByCode('newsman_clean_logs_sale_order_info');
+		$this->model_setting_event->addEvent([
+			'code'        => 'newsman_clean_logs_sale_order_info',
+			'description' => 'Newsman clean logs on sale order view',
+			'trigger'     => 'admin/view/sale/order_info/before',
+			'action'      => 'extension/newsman/module/newsman.eventCleanLogs',
+			'status'      => 1,
+			'sort_order'  => 1
+		]);
+		$this->model_setting_event->deleteEventByCode('newsman_clean_logs_catalog_product_form');
+		$this->model_setting_event->addEvent([
+			'code'        => 'newsman_clean_logs_catalog_product_form',
+			'description' => 'Newsman clean logs on catalog product view',
+			'trigger'     => 'admin/view/catalog/product_form/before',
+			'action'      => 'extension/newsman/module/newsman.eventCleanLogs',
+			'status'      => 1,
+			'sort_order'  => 1
+		]);
+		$this->model_setting_event->deleteEventByCode('newsman_clean_logs_dashboard');
+		$this->model_setting_event->addEvent([
+			'code'        => 'newsman_clean_logs_dashboard',
+			'description' => 'Newsman clean logs on dashboard view',
+			'trigger'     => 'admin/view/common/dashboard/before',
+			'action'      => 'extension/newsman/module/newsman.eventCleanLogs',
+			'status'      => 1,
+			'sort_order'  => 1
+		]);
+		$this->model_setting_event->deleteEventByCode('newsman_clean_logs_module');
+		$this->model_setting_event->addEvent([
+			'code'        => 'newsman_clean_logs_module',
+			'description' => 'Newsman clean logs on module view',
+			'trigger'     => 'admin/view/extension/newsman/module/newsman/before',
+			'action'      => 'extension/newsman/module/newsman.eventCleanLogs',
+			'status'      => 1,
+			'sort_order'  => 1
+		]);
+
+		$this->model_setting_event->deleteEventByCode('newsman_checkout_order_add_after');
+		$this->model_setting_event->addEvent([
+			'code'        => 'newsman_checkout_order_add_after',
+			'description' => 'Newsman sync on checkout order add after',
+			'trigger'     => 'catalog/model/checkout/order.addOrder/after',
+			'action'      => 'extension/newsman/module/newsman.eventCheckoutOrderAddAfter',
+			'status'      => 1,
+			'sort_order'  => 1
+		]);
+
+		$this->model_setting_event->deleteEventByCode('newsman_api_order_after');
+		$this->model_setting_event->addEvent([
+			'code'        => 'newsman_api_order_after',
+			'description' => 'Newsman sync on API order index after',
+			'trigger'     => 'catalog/controller/api/order/after',
+			'action'      => 'extension/newsman/module/newsman.eventApiOrderAfter',
+			'status'      => 1,
+			'sort_order'  => 1
+		]);
+
+		$this->model_setting_event->deleteEventByCode('newsman_account_newsletter_save_before');
+		$this->model_setting_event->addEvent([
+			'code'        => 'newsman_account_newsletter_save_before',
+			'description' => 'Newsman sync on account newsletter change',
+			'trigger'     => 'catalog/controller/account/newsletter.save/before',
+			'action'      => 'extension/newsman/module/newsman.eventAccountNewsletterBefore',
+			'status'      => 1,
+			'sort_order'  => 1
+		]);
+
+		$this->model_setting_event->deleteEventByCode('newsman_account_register_after');
+		$this->model_setting_event->addEvent([
+			'code'        => 'newsman_account_register_after',
+			'description' => 'Newsman sync on account register after',
+			'trigger'     => 'catalog/controller/account/register.register/after',
+			'action'      => 'extension/newsman/module/newsman.eventAccountRegisterAfter',
+			'status'      => 1,
+			'sort_order'  => 1
+		]);
+
+		$this->model_setting_event->deleteEventByCode('newsman_checkout_register_save_after');
+		$this->model_setting_event->addEvent([
+			'code'        => 'newsman_checkout_register_save_after',
+			'description' => 'Newsman sync on checkout register save after',
+			'trigger'     => 'catalog/controller/checkout/register.save/after',
+			'action'      => 'extension/newsman/module/newsman.eventCheckoutRegisterSaveAfter',
+			'status'      => 1,
+			'sort_order'  => 1
+		]);
+
+		$this->model_setting_event->deleteEventByCode('newsman_checkout_success_before');
+		$this->model_setting_event->addEvent([
+			'code'        => 'newsman_checkout_success_before',
+			'description' => 'Newsman remarketing on checkout success before',
+			'trigger'     => 'catalog/controller/checkout/success/before',
+			'action'      => 'extension/newsman/module/newsman.eventCheckoutSuccessBefore',
+			'status'      => 1,
+			'sort_order'  => 1
+		]);
+
+		$this->model_setting_event->deleteEventByCode('newsman_admin_customer_edit_before');
+		$this->model_setting_event->addEvent([
+			'code'        => 'newsman_admin_customer_edit_before',
+			'description' => 'Newsman sync on admin customer save before',
+			'trigger'     => 'admin/controller/customer/customer.save/before',
+			'action'      => 'extension/newsman/module/newsman.eventSaveCustomerBefore',
+			'status'      => 1,
+			'sort_order'  => 1
+		]);
+
+		$this->model_setting_event->deleteEventByCode('newsman_admin_customer_delete_before');
+		$this->model_setting_event->addEvent([
+			'code'        => 'newsman_admin_customer_delete_before',
+			'description' => 'Newsman sync on admin customer delete before',
+			'trigger'     => 'admin/controller/customer/customer.delete/before',
+			'action'      => 'extension/newsman/module/newsman.eventDeleteCustomerBefore',
+			'status'      => 1,
+			'sort_order'  => 1
+		]);
+		$this->model_setting_event->deleteEventByCode('newsman_catalog_cron_gdpr_before');
+		$this->model_setting_event->addEvent([
+			'code'        => 'newsman_catalog_cron_gdpr_before',
+			'description' => 'Newsman sync on catalog cron gdpr before',
+			'trigger'     => 'catalog/controller/cron/gdpr/before',
+			'action'      => 'extension/newsman/module/newsman.eventCronGdprBefore',
+			'status'      => 1,
+			'sort_order'  => 1
+		]);
+	}
+
+	/**
+	 * Get the current version of setup from the oc_setting table.
+	 *
+	 * @param int $store_id
+	 *
+	 * @return false|mixed|null
+	 */
+	public function getCurrentVersion($store_id) {
+		return $this->nzmconfig->getSetupVersion($store_id);
+	}
+}

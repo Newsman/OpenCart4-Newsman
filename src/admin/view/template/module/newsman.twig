@@ -1,0 +1,245 @@
+{{ header }}{{ column_left }}
+<div id="content">
+    <div class="page-header">
+        <div class="container-fluid">
+            <div class="float-end">
+                <button type="submit" form="form-newsman" data-bs-toggle="tooltip" title="{{ button_save }}" class="btn btn-primary"><i class="fa-solid fa-save"></i></button>
+                <a href="{{ cancel }}" data-bs-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-light"><i class="fa-solid fa-reply"></i></a>
+            </div>
+            <h1>{{ heading_title }}</h1>
+            <ol class="breadcrumb">
+                {% for breadcrumb in breadcrumbs %}
+                    <li class="breadcrumb-item"><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+                {% endfor %}
+            </ol>
+            |&nbsp;<a href="{{ url_remarketing_settings }}" title="{{ text_remarketing_settings }}">{{ text_remarketing_settings }}</a>
+        </div>
+    </div>
+    <div class="container-fluid">
+        <div id="alerts">
+            {% if success %}
+                <div class="alert alert-success alert-dismissible" role="alert">
+                    <i class="fa-solid fa-check-circle" aria-hidden="true"></i>&nbsp;{{ success }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{{ text_close }}"></button>
+                </div>
+            {% endif %}
+            {% if error %}
+                <div class="alert alert-danger alert-dismissible" role="alert">
+                    <i class="fa-solid fa-exclamation-triangle" aria-hidden="true"></i>&nbsp;{{ error }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{{ text_close }}"></button>
+                </div>
+            {% endif %}
+            {% if warning %}
+                <div class="alert alert-warning alert-dismissible" role="alert">
+                    <i class="fa-solid fa-info-circle"></i>&nbsp;{{ warning }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    <form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-newsman">
+        <div class="container-fluid">
+            <div class="card mb-3">
+                <div class="card-header">
+                    <i class="fa-solid fa-pencil"></i> {{ text_header_edit }}
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <label class="col-sm-2 col-form-label" for="input-api-status">
+                            <span data-bs-toggle="tooltip" title="{{ text_api_status_hint }}">{{ entry_api_status }}</span>
+                        </label>
+                        <div class="col-sm-10">
+                            <div class="col-form-label text-start">
+                                {% if is_connected %}
+                                    <strong style="color: #40826D;">{{ text_credentials_valid }}</strong>
+                                {% else %}
+                                    <strong style="color: #D2042D;">{{ text_credentials_invalid }}</strong>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label class="col-sm-2 col-form-label" for="input-module-newsman-status">{{ entry_module_status }}</label>
+                        <div class="col-sm-10">
+                            <div class="form-check form-switch form-switch-lg">
+                                <input type="hidden" name="module_newsman_status" value="0"/>
+                                <input type="checkbox" name="module_newsman_status" value="1" id="input-module-newsman-status" class="form-check-input"{% if module_newsman_status %} checked{% endif %}/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-3 required">
+                        <label class="col-sm-2 col-form-label" for="input-user-id">{{ entry_user_id }}</label>
+                        <div class="col-sm-10">
+                            <input type="text" name="newsman_user_id" value="{{ newsman_user_id }}" placeholder="{{ entry_user_id }}" id="input-user-id" class="form-control">
+                        </div>
+                    </div>
+                    <div class="row mb-3 required">
+                        <label class="col-sm-2 col-form-label" for="input-api-key">{{ entry_api_key }}</label>
+                        <div class="col-sm-10">
+                            <input type="text" name="newsman_api_key" value="{{ newsman_api_key }}" placeholder="{{ entry_api_key }}" id="input-api-key" class="form-control">
+                        </div>
+                    </div>
+                    <div class="row mb-3 required">
+                        <label class="col-sm-2 col-form-label" for="input-list-id">{{ entry_list_id }}</label>
+                        <div class="col-sm-10">
+                            <select name="newsman_list_id" id="input-list-id" class="form-select">
+                                <option value="" {% if newsman_list_id == '' %}selected{% endif %}>{{ text_please_select_list }}</option>
+                                {% for list_item in list_options %}
+                                    <option value="{{ list_item.list_id }}" {% if newsman_list_id == list_item.list_id %}selected{% endif %}>{{ list_item.list_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label class="col-sm-2 col-form-label" for="input-segment">{{ entry_segment }}</label>
+                        <div class="col-sm-10">
+                            <select name="newsman_segment" id="input-segment" class="form-select">
+                                <option value="" {% if newsman_segment == '' %}selected{% endif %}>{{ text_please_select_segment }}</option>
+                                {% for segment_item in segment_options %}
+                                    <option value="{{ segment_item.segment_id }}" {% if newsman_segment == segment_item.segment_id %}selected{% endif %}>{{ segment_item.segment_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label class="col-sm-2 col-form-label" for="input-newsletter-double-optin">{{ entry_newsletter_double_optin }}</label>
+                        <div class="col-sm-10">
+                            <div class="form-check form-switch form-switch-lg">
+                                <input type="hidden" name="newsman_newsletter_double_optin" value="0"/>
+                                <input type="checkbox" name="newsman_newsletter_double_optin" value="1" id="input-newsletter-double-optin" class="form-check-input"{% if newsman_newsletter_double_optin %} checked{% endif %}/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label class="col-sm-2 col-form-label" for="input-send-user-ip">{{ entry_send_user_ip }}</label>
+                        <div class="col-sm-10">
+                            <div class="form-check form-switch form-switch-lg">
+                                <input type="hidden" name="newsman_send_user_ip" value="0"/>
+                                <input type="checkbox" name="newsman_send_user_ip" value="1" id="input-send-user-ip" class="form-check-input"{% if newsman_send_user_ip %} checked{% endif %}/>
+                            </div>
+                            <div class="form-text">{{ entry_send_user_ip_help }}</div>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label class="col-sm-2 col-form-label" for="input-server-ip">{{ entry_server_ip }}</label>
+                        <div class="col-sm-10">
+                            <input type="text" name="newsman_server_ip" value="{{ newsman_server_ip }}" placeholder="{{ entry_server_ip }}" id="input-server-ip" class="form-control">
+                            <div class="form-text">{{ entry_server_ip_help }}</div>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label class="col-sm-2 col-form-label" for="input-export-authorize-header-name">
+                            <span data-bs-toggle="tooltip" title="{{ text_export_authorize_header_name_hint }}">{{ entry_export_authorize_header_name }}</span>
+                        </label>
+                        <div class="col-sm-10">
+                            <input type="text" name="newsman_export_authorize_header_name" value="{{ newsman_export_authorize_header_name }}" placeholder="{{ entry_export_authorize_header_name }}" id="input-export-authorize-header-name" class="form-control">
+                            <div class="form-text">{{ text_export_authorize_header_name_help }}</div>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label class="col-sm-2 col-form-label" for="input-export-authorize-header-key">
+                            <span data-bs-toggle="tooltip" title="{{ text_export_authorize_header_key_hint }}">{{ entry_export_authorize_header_key }}</span>
+                        </label>
+                        <div class="col-sm-10">
+                            <input type="text" name="newsman_export_authorize_header_key" value="{{ newsman_export_authorize_header_key }}" placeholder="{{ entry_export_authorize_header_key }}" id="input-export-authorize-header-key" class="form-control">
+                            <div class="form-text">{{ text_export_authorize_header_key_help }}</div>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label class="col-sm-2 col-form-label">{{ text_cron }}</label>
+                        <div class="col-sm-10">
+                            <div class="col-form-label text-start">
+                                {yoursiteurl}/index.php?route=extension/newsman/module/newsman.cron&nzmhash={{ newsman_api_key }}
+                                <br>
+                                {yoursiteurl}/index.php?route=extension/newsman/module/newsman.cronOrders&last-days=60&nzmhash={{ newsman_api_key }}
+                                <br><br>
+                                <a href="{{ export_subscribers }}" class="btn btn-info"><i class="fa-solid fa-upload"></i> {{ button_export_subscribers }}</a>
+                                <a href="{{ export_orders }}" class="btn btn-info ms-2"><i class="fa-solid fa-upload"></i> {{ button_export_orders }}</a>
+                                <a href="{{ export_orders_60_days }}" class="btn btn-info ms-2"><i class="fa-solid fa-upload"></i> {{ button_export_orders_60_days }}</a>
+                                <br><br>
+                                <a href="{{ reconfigure }}" class="btn btn-primary" onclick="return confirm('{{ text_reconfigure }} ?');"><i class="fa-solid fa-cog"></i> {{ button_reconfigure }}</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card mb-3">
+                <div class="card-header">
+                    <i class="fa-solid fa-pencil"></i> {{ text_header_developer_edit }}
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <label class="col-sm-2 col-form-label" for="input-developer-log-severity">{{ entry_developer_log_severity }}</label>
+                        <div class="col-sm-10">
+                            <select name="newsman_developer_log_severity" id="input-developer-log-severity" class="form-select">
+                                {% for level_debug in developer_log_severity_options %}
+                                    <option value="{{ level_debug.code }}" {% if newsman_developer_log_severity == level_debug.code %}selected{% endif %}>{{ level_debug.type }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label class="col-sm-2 col-form-label" for="input-developer-log-clean-days">{{ entry_developer_log_clean_days }}</label>
+                        <div class="col-sm-10">
+                            <input type="text" name="newsman_developer_log_clean_days" value="{{ newsman_developer_log_clean_days }}" placeholder="{{ entry_developer_log_clean_days }}" id="input-developer-log-clean-days" class="form-control">
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label class="col-sm-2 col-form-label" for="input-developer-api-timeout">{{ entry_developer_api_timeout }}</label>
+                        <div class="col-sm-10">
+                            <input type="text" name="newsman_developer_api_timeout" value="{{ newsman_developer_api_timeout }}" placeholder="{{ entry_developer_api_timeout }}" id="input-developer-api-timeout" class="form-control">
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label class="col-sm-2 col-form-label" for="input-developer-active-user-ip">{{ entry_developer_active_user_ip }}</label>
+                        <div class="col-sm-10">
+                            <div class="form-check form-switch form-switch-lg">
+                                <input type="hidden" name="newsman_developer_active_user_ip" value="0"/>
+                                <input type="checkbox" name="newsman_developer_active_user_ip" value="1" id="input-developer-active-user-ip" class="form-check-input"{% if newsman_developer_active_user_ip %} checked{% endif %}/>
+                            </div>
+                            <div class="form-text">{{ entry_developer_active_user_ip_help }}</div>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label class="col-sm-2 col-form-label" for="input-developer-user-ip">{{ entry_developer_user_ip }}</label>
+                        <div class="col-sm-10">
+                            <input type="text" name="newsman_developer_user_ip" value="{{ newsman_developer_user_ip }}" placeholder="{{ entry_developer_user_ip }}" id="input-developer-user-ip" class="form-control">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+{{ footer }}
+<script type="text/javascript">
+$(document).ready(function() {
+    function toggleSettings() {
+        if ($('#input-send-user-ip').is(':checked')) {
+            $('#input-server-ip').parent().parent().hide();
+        } else {
+            $('#input-server-ip').parent().parent().show();
+        }
+
+        if (!$('#input-checkout-newsletter').is(':checked')) {
+            $('#input-checkout-newsletter-default').parent().parent().hide();
+            $('#input-checkout-newsletter-label').parent().parent().hide();
+        } else {
+            $('#input-checkout-newsletter-default').parent().parent().show();
+            $('#input-checkout-newsletter-label').parent().parent().show();
+        }
+
+        if (!$('#input-developer-active-user-ip').is(':checked')) {
+            $('#input-developer-user-ip').parent().parent().hide();
+        } else {
+            $('#input-developer-user-ip').parent().parent().show();
+        }
+    }
+
+    toggleSettings();
+
+    $('#input-send-user-ip, #input-checkout-newsletter, #input-developer-active-user-ip').on('change', function() {
+        toggleSettings();
+    });
+});
+</script>
