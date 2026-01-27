@@ -15,11 +15,9 @@ Manual installation:
 
 ## Newsman Remarketing
 
-1. Extensions -> Installer -> Upload NewsMANremarketing.ocmod.zip
-2. Extensions -> Modifications -> Refresh
-3. Extensions -> Extensions -> Analytics -> NewsMAN Remarketing
-
-If the default OCMOD doesn't work, upload Oc 3.x Fix OCMOD.ocmod.zip at Extensions -> Installer.
+~~1. Extensions -> Installer -> Upload NewsMANremarketing.ocmod.zip~~
+~~2. Extensions -> Modifications -> Refresh~~
+~~3. Extensions -> Extensions -> Analytics -> NewsMAN Remarketing~~
 
 # Setup
 
