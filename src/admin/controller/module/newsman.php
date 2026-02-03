@@ -867,8 +867,8 @@ class Newsman extends \Opencart\System\Engine\Controller {
 
 		if ($this->user->hasPermission('access', 'extension/newsman/module/newsman')) {
 			$newsman[] = [
-				'name'     => $this->language->get('text_newsman'),
-				'href'     => $this->url->link('extension/newsman/module/newsman', 'user_token=' . $this->session->data['user_token']),
+				'name'     => $this->language->get('text_settings'),
+				'href'     => $this->url->link('extension/newsman/module/newsman', 'user_token=' . $this->session->data['user_token'] . '&store_id=' . $this->store_id),
 				'children' => []
 			];
 		}
@@ -876,7 +876,7 @@ class Newsman extends \Opencart\System\Engine\Controller {
 		if ($this->user->hasPermission('access', 'extension/newsman/analytics/newsmanremarketing')) {
 			$newsman[] = [
 				'name'     => $this->language->get('text_newsman_remarketing'),
-				'href'     => $this->url->link('extension/newsman/analytics/newsmanremarketing', 'user_token=' . $this->session->data['user_token']),
+				'href'     => $this->url->link('extension/newsman/analytics/newsmanremarketing', 'user_token=' . $this->session->data['user_token'] . '&store_id=' . $this->store_id),
 				'children' => []
 			];
 		}
