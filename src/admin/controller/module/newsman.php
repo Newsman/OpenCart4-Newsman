@@ -860,6 +860,38 @@ class Newsman extends \Opencart\System\Engine\Controller {
 		$this->nzmsetup->upgrade();
 	}
 
+	public function eventMenuBefore(string &$route, array &$args): void {
+		$this->load->language('extension/newsman/module/newsman');
+
+		$newsman = [];
+
+		if ($this->user->hasPermission('access', 'extension/newsman/module/newsman')) {
+			$newsman[] = [
+				'name'     => $this->language->get('text_newsman'),
+				'href'     => $this->url->link('extension/newsman/module/newsman', 'user_token=' . $this->session->data['user_token']),
+				'children' => []
+			];
+		}
+
+		if ($this->user->hasPermission('access', 'extension/newsman/analytics/newsmanremarketing')) {
+			$newsman[] = [
+				'name'     => $this->language->get('text_newsman_remarketing'),
+				'href'     => $this->url->link('extension/newsman/analytics/newsmanremarketing', 'user_token=' . $this->session->data['user_token']),
+				'children' => []
+			];
+		}
+
+		if ($newsman) {
+			$args['menus'][] = [
+				'id'       => 'menu-newsman',
+				'icon'     => 'fa-solid fa-envelope',
+				'name'     => 'NewsMAN',
+				'href'     => '',
+				'children' => $newsman
+			];
+		}
+	}
+
 
 	public function eventSaveCustomerBefore(string &$route, array &$args): void {
 		$this->nzmloader->autoload();

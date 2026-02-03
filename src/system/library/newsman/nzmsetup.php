@@ -116,6 +116,8 @@ class Nzmsetup extends \Newsman\Library {
 		$this->model_setting_event->deleteEventByCode('newsman_admin_customer_edit_before');
 		$this->model_setting_event->deleteEventByCode('newsman_admin_customer_delete_before');
 		$this->model_setting_event->deleteEventByCode('newsman_catalog_cron_gdpr_before');
+
+		$this->model_setting_event->deleteEventByCode('newsman_admin_menu_before');
 	}
 
 	/**
@@ -445,6 +447,15 @@ jt/modal_{{api_key}}.js';
 			'description' => 'Newsman sync on catalog cron gdpr before',
 			'trigger'     => 'catalog/controller/cron/gdpr/before',
 			'action'      => 'extension/newsman/module/newsman.eventCronGdprBefore',
+			'status'      => 1,
+			'sort_order'  => 1
+		]);
+		$this->model_setting_event->deleteEventByCode('newsman_admin_menu_before');
+		$this->model_setting_event->addEvent([
+			'code'        => 'newsman_admin_menu_before',
+			'description' => 'Newsman admin menu before',
+			'trigger'     => 'admin/view/common/column_left/before',
+			'action'      => 'extension/newsman/module/newsman.eventMenuBefore',
 			'status'      => 1,
 			'sort_order'  => 1
 		]);
