@@ -11,6 +11,7 @@ namespace Opencart\Admin\Controller\Extension\Newsman\Module;
  * @property \Newsman\Nzmconfig                              $nzmconfig
  * @property \Newsman\Nzmsetup                               $nzmsetup
  * @property \Newsman\Nzmlogger                              $nzmlogger
+ * @property \Newsman\Util\Version                           $nzmversion
  * @property \Opencart\System\Engine\Loader                  $load
  * @property \Opencart\System\Engine\Config                  $config
  * @property \Opencart\System\Library\Session                $session
@@ -556,6 +557,8 @@ class Newsman extends \Opencart\System\Engine\Controller {
 		$this->load->model('setting/setting');
 		$this->load->model('extension/newsman/setting');
 		$data = $this->load->language('extension/newsman/module/newsman');
+		$version = new \Newsman\Util\Version($this->registry);
+		$data['extension_version'] = $version->getVersion();
 		$this->document->setTitle($this->language->get('heading_title'));
 
 		$data['breadcrumbs'] = $this->breadcrumbs();

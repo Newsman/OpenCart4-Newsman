@@ -1,0 +1,7 @@
+{
+  "name": "NewsMAN Newsletter Sync",
+  "description": "Sync OpenCart products, subscribers, customers, orders and other with Newsman. Adds remarketing tracking capabilities.",
+  "version": "2.0.0",
+  "author": "Newsman",
+  "link": "https://www.newsman.ro/"
+}
