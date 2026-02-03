@@ -7,7 +7,7 @@
                 <a href="{{ cancel }}" data-bs-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-light"><i class="fa-solid fa-reply"></i></a>
             </div>
             <h1>{{ heading_title }}</h1>
-            <div class="form-text">Newsman Extension Version: {{ extension_version }}</div>
+            <div class="form-text">{{ text_extension_version }}: {{ extension_version }}</div>
             <ol class="breadcrumb">
                 {% for breadcrumb in breadcrumbs %}
                     <li class="breadcrumb-item"><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
