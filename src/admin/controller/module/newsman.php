@@ -901,7 +901,7 @@ class Newsman extends \Opencart\System\Engine\Controller {
 		foreach ($selected as $customer_id) {
 			$customer_info = $this->model_customer_customer->getCustomer((int)$customer_id);
 
-			if ($customer_info && isset($customer_info['email'])) {
+			if ($customer_info && !empty($customer_info['email']) && !empty($customer_info['newsletter'])) {
 				$this->unsubscribe($customer_info['email'], (int)$customer_info['store_id']);
 			}
 		}
