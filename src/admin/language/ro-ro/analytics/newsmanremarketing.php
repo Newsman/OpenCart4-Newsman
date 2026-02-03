@@ -8,6 +8,8 @@ $_['text_edit'] = 'Editează NewsMAN Remarketing';
 $_['text_signup'] = 'Conectați-vă la <a href="https://www.newsman.app/" target="_blank"><u>contul NewsMAN</u></a> pentru a obține ID-ul';
 $_['text_default'] = 'Implicit';
 $_['text_newsman_settings'] = 'Setări Newsman';
+$_['text_config_for_store'] = 'Configurare pentru magazinul: %s (ID: %s)';
+$_['text_store'] = 'Magazin';
 $_['text_remarketing_id_status'] = 'Status ID Remarketing';
 $_['text_remarketing_id_valid'] = 'ID-ul Remarketing este valid';
 $_['text_remarketing_id_invalid'] = 'ID-ul Remarketing este invalid sau există o eroare API temporară!';

@@ -16,6 +16,20 @@
         </div>
     </div>
     <div class="container-fluid">
+        <div class="card mb-3">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <label class="col-form-label" for="input-store">{{ text_store }}</label>
+                        <select name="store_id" id="input-store" class="form-select" onchange="location = this.value;">
+                            {% for store in stores %}
+                                <option value="{{ store.href }}" {% if store.store_id == store_id %}selected{% endif %}>{{ store.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div id="alerts">
             {% if success %}
                 <div class="alert alert-success alert-dismissible" role="alert">
@@ -145,6 +159,28 @@
                             <div class="form-text">{{ text_export_authorize_header_key_help }}</div>
                         </div>
                     </div>
+                    {% if is_multistore %}
+                    <div class="row mb-3">
+                        <label class="col-sm-2 col-form-label" for="input-export-subscribers-by-store">{{ entry_export_subscribers_by_store }}</label>
+                        <div class="col-sm-10">
+                            <select name="newsman_export_subscribers_by_store" id="input-export-subscribers-by-store" class="form-select">
+                                <option value="0" {% if not newsman_export_subscribers_by_store %}selected{% endif %}>{{ text_disabled }}</option>
+                                <option value="1" {% if newsman_export_subscribers_by_store %}selected{% endif %}>{{ text_enabled }}</option>
+                            </select>
+                            <div class="form-text">{{ entry_export_subscribers_by_store_help }}</div>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label class="col-sm-2 col-form-label" for="input-export-customers-by-store">{{ entry_export_customers_by_store }}</label>
+                        <div class="col-sm-10">
+                            <select name="newsman_export_customers_by_store" id="input-export-customers-by-store" class="form-select">
+                                <option value="1" {% if newsman_export_customers_by_store %}selected{% endif %}>{{ text_enabled }}</option>
+                                <option value="0" {% if not newsman_export_customers_by_store %}selected{% endif %}>{{ text_disabled }}</option>
+                            </select>
+                            <div class="form-text">{{ entry_export_customers_by_store_help }}</div>
+                        </div>
+                    </div>
+                    {% endif %}
                     <div class="row mb-3">
                         <label class="col-sm-2 col-form-label">{{ text_cron }}</label>
                         <div class="col-sm-10">
@@ -158,6 +194,7 @@
                                 <a href="{{ export_orders_60_days }}" class="btn btn-info ms-2"><i class="fa-solid fa-upload"></i> {{ button_export_orders_60_days }}</a>
                                 <br><br>
                                 <a href="{{ reconfigure }}" class="btn btn-primary" onclick="return confirm('{{ text_reconfigure }} ?');"><i class="fa-solid fa-cog"></i> {{ button_reconfigure }}</a>
+                                <span style="font-size: 1.2em; vertical-align: middle; margin-left: 10px;"><b><i class="fa-solid fa-cog"></i> {{ text_config_for_store }}</b></span>
                             </div>
                         </div>
                     </div>

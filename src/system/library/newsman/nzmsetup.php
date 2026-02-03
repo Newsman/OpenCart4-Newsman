@@ -90,7 +90,9 @@ class Nzmsetup extends \Newsman\Library {
 		$this->load->model('setting/event');
 		$this->model_setting_event = $this->registry->get('model_setting_event');
 
+		$this->model_setting_setting->deleteSetting('module_newsman');
 		$this->model_setting_setting->deleteSetting('newsman');
+		$this->model_setting_setting->deleteSetting('analytics_newsmanremarketing');
 
 		$this->model_setting_event->deleteEventByCode('newsman_upgrade_setup_sale_order_info');
 		$this->model_setting_event->deleteEventByCode('newsman_upgrade_setup_catalog_product_form');
@@ -179,6 +181,8 @@ class Nzmsetup extends \Newsman\Library {
 		$data['newsman_api_url'] = 'https://ssl.newsman.app/api/';
 		$data['newsman_api_version'] = '1.2';
 		$data['newsman_send_user_ip'] = 1;
+		$data['newsman_export_subscribers_by_store'] = 0;
+		$data['newsman_export_customers_by_store'] = 0;
 		$data['newsman_developer_active_user_ip'] = 0;
 		$data['newsman_developer_user_ip'] = '';
 		$data['newsman_newsletter_double_optin'] = 0;

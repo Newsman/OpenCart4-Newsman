@@ -8,6 +8,8 @@ $_['text_edit'] = 'Edit NewsMAN Remarketing';
 $_['text_signup'] = 'Login to your <a href="https://www.newsman.app/" target="_blank"><u>NewsMAN account</u></a> and get your ID';
 $_['text_default'] = 'Default';
 $_['text_newsman_settings'] = 'Newsman Settings';
+$_['text_config_for_store'] = 'Configuration for store: %s (ID: %s)';
+$_['text_store'] = 'Store';
 $_['text_remarketing_id_status'] = 'Remarketing ID Status';
 $_['text_remarketing_id_valid'] = 'Remarketing ID is valid';
 $_['text_remarketing_id_invalid'] = 'Remarketing ID is invalid or there is temporarily API error!';

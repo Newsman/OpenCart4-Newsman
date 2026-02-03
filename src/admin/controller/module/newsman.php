@@ -67,7 +67,9 @@ class Newsman extends \Opencart\System\Engine\Controller {
 		'developer_log_clean_days',
 		'developer_api_timeout',
 		'developer_active_user_ip',
-		'developer_user_ip'
+		'developer_user_ip',
+		'export_subscribers_by_store',
+		'export_customers_by_store'
 	);
 
 	/**
@@ -118,6 +120,15 @@ class Newsman extends \Opencart\System\Engine\Controller {
 		$data['breadcrumbs'] = $this->breadcrumbs();
 		$data['oauth_url'] = $this->getOauthUrl();
 
+		$this->load->model('setting/store');
+		$store_info = $this->model_setting_store->getStore($this->store_id);
+		if ($store_info) {
+			$store_name = $store_info['name'];
+		} else {
+			$store_name = $this->config->get('config_name') . $this->language->get('text_default');
+		}
+		$data['text_setup_for_store'] = sprintf($this->language->get('text_setup_for_store'), $store_name, $this->store_id);
+
 		$this->setSessionCookieLax();
 
 		$this->load->model('setting/setting');
@@ -149,6 +160,15 @@ class Newsman extends \Opencart\System\Engine\Controller {
 		$data['heading_title'] = $this->language->get('heading_title');
 		$data['breadcrumbs'] = $this->breadcrumbs();
 		$data['oauth_url'] = $this->getOauthUrl();
+
+		$this->load->model('setting/store');
+		$store_info = $this->model_setting_store->getStore($this->store_id);
+		if ($store_info) {
+			$store_name = $store_info['name'];
+		} else {
+			$store_name = $this->config->get('config_name') . $this->language->get('text_default');
+		}
+		$data['text_setup_for_store'] = sprintf($this->language->get('text_setup_for_store'), $store_name, $this->store_id);
 
 		$this->setSessionCookieLax();
 
@@ -270,6 +290,7 @@ class Newsman extends \Opencart\System\Engine\Controller {
 		$this->model_extension_newsman_setting->editSetting('newsman', $settings, $this->store_id);
 		$this->model_extension_newsman_setting->editSetting('module_newsman', array('module_newsman_status' => 1), $this->store_id);
 
+		$this->nzmconfig->init(true);
 		$this->nzmsetup->upgrade();
 
 		$remarketing_response = $this->getRemarketingSettings($list_id, $user_id, $api_key);
@@ -495,6 +516,15 @@ class Newsman extends \Opencart\System\Engine\Controller {
 
 	protected function breadcrumbs() {
 		$this->load->language('extension/newsman/module/newsman');
+
+		$this->load->model('setting/store');
+		$store_info = $this->model_setting_store->getStore($this->store_id);
+		if ($store_info) {
+			$store_name = $store_info['name'];
+		} else {
+			$store_name = $this->config->get('config_name') . $this->language->get('text_default');
+		}
+
 		$breadcrumbs = array();
 		$breadcrumbs[] = array(
 			'text' => $this->language->get('text_home'),
@@ -512,7 +542,7 @@ class Newsman extends \Opencart\System\Engine\Controller {
 		);
 
 		$breadcrumbs[] = array(
-			'text' => $this->language->get('heading_title'),
+			'text' => $this->language->get('heading_title') . ' - ' . $store_name,
 			'href' => $this->url->link($this->location['module'] . '/newsman', [
 				$this->names['token'] => $this->session->data[$this->names['token']],
 				'store_id' => $this->store_id
@@ -547,6 +577,41 @@ class Newsman extends \Opencart\System\Engine\Controller {
 			$data['warning'] = $this->language->get('error_permission');
 		}
 
+		$this->load->model('setting/store');
+
+		$data['stores'] = array();
+
+		$data['stores'][] = array(
+			'store_id' => 0,
+			'name'     => $this->config->get('config_name') . $this->language->get('text_default'),
+			'href'     => $this->url->link($this->location['module'] . '/newsman', $this->names['token'] . '=' . $this->session->data[$this->names['token']] . '&store_id=0', true)
+		);
+
+		$results = $this->model_setting_store->getStores();
+
+		foreach ($results as $result) {
+			$data['stores'][] = array(
+				'store_id' => $result['store_id'],
+				'name'     => $result['name'],
+				'href'     => $this->url->link($this->location['module'] . '/newsman', $this->names['token'] . '=' . $this->session->data[$this->names['token']] . '&store_id=' . $result['store_id'], true)
+			);
+		}
+
+		$data['store_id'] = $this->store_id;
+		$data['is_multistore'] = (count($data['stores']) > 1);
+
+		$store_info = $this->model_setting_store->getStore($this->store_id);
+		if ($store_info) {
+			$data['store_name'] = $store_info['name'];
+		} else {
+			$data['store_name'] = $this->config->get('config_name') . $this->language->get('text_default');
+		}
+
+		$data['action'] = $this->url->link($this->location['module'] . '/newsman', $this->names['token'] . '=' . $this->session->data[$this->names['token']] . '&store_id=' . $this->store_id, true);
+
+		$data['text_store'] = $this->language->get('text_store');
+		$data['text_config_for_store'] = sprintf($this->language->get('text_config_for_store'), $data['store_name'], $this->store_id);
+
 		$this->addPageLayout($data);
 
 		foreach ($this->field_names as $field) {
@@ -571,7 +636,8 @@ class Newsman extends \Opencart\System\Engine\Controller {
 			$this->session->data['success'] = $this->language->get('text_success');
 			$this->response->redirect($this->url->link($this->location['module'] . '/newsman', [
 				$this->names['token'] => $this->session->data[$this->names['token']],
-				'type' => 'module'
+				'type'     => 'module',
+				'store_id' => $this->store_id
 			]));
 		}
 
@@ -607,7 +673,8 @@ class Newsman extends \Opencart\System\Engine\Controller {
 		}
 
 		$data['url_remarketing_settings'] = $this->url->link('extension/newsman/analytics/newsmanremarketing', [
-			$this->names['token'] => $this->session->data[$this->names['token']]
+			$this->names['token'] => $this->session->data[$this->names['token']],
+			'store_id' => $this->store_id
 		]);
 		$data['reconfigure'] = $this->url->link('extension/newsman/module/newsman.step1', [
 			'store_id' => $this->store_id,
