@@ -144,7 +144,7 @@ class Newsmanremarketing extends \Opencart\System\Engine\Controller {
 
 		$data['stores'][] = array(
 			'store_id' => 0,
-			'name'     => $this->config->get('config_name') . $this->language->get('text_default'),
+			'name'     => $this->config->get('config_name') . ' (' . $this->language->get('text_default') . ')',
 			'href'     => $this->url->link($this->location['module'], $this->names['token'] . '=' . $this->session->data[$this->names['token']] . '&store_id=0', true)
 		);
 
