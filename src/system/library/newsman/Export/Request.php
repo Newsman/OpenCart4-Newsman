@@ -3,6 +3,7 @@
 namespace Newsman\Export;
 
 use Newsman\Export\Retriever\Authenticator;
+use Newsman\Export\Retriever\Pool;
 
 /**
  * Class Export Request
@@ -24,6 +25,8 @@ class Request extends \Newsman\Nzmbase {
 		'created_at',
 		'modified_at',
 		'last-days',
+		'sort',
+		'order',
 		// Subscriber export
 		'subscriber_id',
 		'subscriber_ids',
@@ -62,6 +65,8 @@ class Request extends \Newsman\Nzmbase {
 		'created_at',
 		'modified_at',
 		'last-days',
+		'sort',
+		'order',
 		// Subscriber export
 		'subscriber_id',
 		'subscriber_ids',
@@ -100,6 +105,11 @@ class Request extends \Newsman\Nzmbase {
 	protected $request;
 
 	/**
+	 * @var \Newsman\Export\Retriever\Pool
+	 */
+	protected $pool;
+
+	/**
 	 * Class construct
 	 *
 	 * @param \Opencart\System\Engine\Registry $registry
@@ -108,6 +118,7 @@ class Request extends \Newsman\Nzmbase {
 		parent::__construct($registry);
 
 		$this->request = $this->registry->request;
+		$this->pool = new Pool($registry);
 	}
 
 	/**
@@ -153,6 +164,36 @@ class Request extends \Newsman\Nzmbase {
 	}
 
 	/**
+	 * Get retrievers parameters
+	 *
+	 * @return array
+	 */
+	protected function getRetrieversParameters() {
+		$parameters = array();
+		$retrievers = $this->pool->getRetrieversWithFilters();
+
+		foreach ($retrievers as $retriever) {
+			$instance = $this->pool->getRetrieverByCode($retriever['code'], array());
+
+			if (method_exists($instance, 'getWhereParametersMapping')) {
+				$mapping = $instance->getWhereParametersMapping();
+				if (is_array($mapping)) {
+					$parameters = array_merge($parameters, array_keys($mapping));
+				}
+			}
+
+			if (method_exists($instance, 'getAllowedSortFields')) {
+				$sort_fields = $instance->getAllowedSortFields();
+				if (is_array($sort_fields)) {
+					$parameters = array_merge($parameters, array_keys($sort_fields));
+				}
+			}
+		}
+
+		return array_unique($parameters);
+	}
+
+	/**
 	 * Get all known parameters
 	 *
 	 * @return array
@@ -174,6 +215,17 @@ class Request extends \Newsman\Nzmbase {
 		}
 
 		foreach ($this->known_post_parameters as $parameter) {
+			if (isset($this->request->post[$parameter])) {
+				$parameters[$parameter] = $this->request->post[$parameter];
+			}
+		}
+
+		$retriever_parameters = $this->getRetrieversParameters();
+
+		foreach ($retriever_parameters as $parameter) {
+			if (isset($this->request->get[$parameter])) {
+				$parameters[$parameter] = $this->request->get[$parameter];
+			}
 			if (isset($this->request->post[$parameter])) {
 				$parameters[$parameter] = $this->request->post[$parameter];
 			}
