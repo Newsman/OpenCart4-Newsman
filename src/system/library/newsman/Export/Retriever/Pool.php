@@ -26,6 +26,10 @@ class Pool extends \Newsman\Nzmbase {
 			'code'  => 'cron-subscribers',
 			'class' => '\Newsman\Export\Retriever\CronSubscribers'
 		),
+		'custom-sql'       => array(
+			'code'  => 'custom-sql',
+			'class' => '\Newsman\Export\Retriever\CustomSql'
+		),
 		'customers'        => array(
 			'code'  => 'customers',
 			'class' => '\Newsman\Export\Retriever\Customers',
