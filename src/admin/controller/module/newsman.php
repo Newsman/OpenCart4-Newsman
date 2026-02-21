@@ -788,20 +788,6 @@ class Newsman extends \Opencart\System\Engine\Controller {
 			$this->names['token'] => $this->session->data[$this->names['token']]
 		]);
 
-		$data['export_subscribers'] = $this->url->link('extension/newsman/module/newsman.exportsubscribers', [
-			'user_token' => $this->session->data['user_token'],
-			'store_id' => $this->store_id
-		]);
-		$data['export_orders'] = $this->url->link('extension/newsman/module/newsman.exportorders', [
-			'user_token' => $this->session->data['user_token'],
-			'store_id' => $this->store_id
-		]);
-		$data['export_orders_60_days'] = $this->url->link('extension/newsman/module/newsman.exportorders', [
-			'user_token' => $this->session->data['user_token'],
-			'store_id' => $this->store_id,
-			'last-days' => 60
-		]);
-
 		$data['header'] = $this->load->controller('common/header');
 		$data['column_left'] = $this->load->controller('common/column_left');
 		$data['footer'] = $this->load->controller('common/footer');
@@ -874,6 +860,9 @@ class Newsman extends \Opencart\System\Engine\Controller {
 		$this->nzmsetup->uninstall();
 	}
 
+	/**
+	 * @deprecated No longer exposed in admin UI.
+	 */
 	public function exportsubscribers(): void {
 		if (!$this->validate()) {
 			$this->load->language('extension/newsman/module/newsman');
@@ -907,6 +896,9 @@ class Newsman extends \Opencart\System\Engine\Controller {
 		]));
 	}
 
+	/**
+	 * @deprecated No longer exposed in admin UI.
+	 */
 	public function exportorders(): void {
 		if (!$this->validate()) {
 			$this->load->language('extension/newsman/module/newsman');

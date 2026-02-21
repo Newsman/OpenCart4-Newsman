@@ -616,6 +616,8 @@ class Nzmconfig extends Library {
 	/**
 	 * Get order date to export orders created after it, including.
 	 *
+	 * @deprecated No longer configured via admin UI.
+	 *
 	 * @param null|int $store_id
 	 *
 	 * @return string

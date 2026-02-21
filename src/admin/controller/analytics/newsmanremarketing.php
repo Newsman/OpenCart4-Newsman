@@ -62,7 +62,6 @@ class Newsmanremarketing extends \Opencart\System\Engine\Controller {
 		'trackingid',
 		'anonymize_ip',
 		'send_telephone',
-		'order_date'
 	);
 
 	/**

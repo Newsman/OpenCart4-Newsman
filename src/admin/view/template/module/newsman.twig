@@ -183,20 +183,9 @@
                     </div>
                     {% endif %}
                     <div class="row mb-3">
-                        <label class="col-sm-2 col-form-label">{{ text_cron }}</label>
-                        <div class="col-sm-10">
-                            <div class="col-form-label text-start">
-                                {yoursiteurl}/index.php?route=extension/newsman/module/newsman.cron&nzmhash={{ newsman_api_key }}
-                                <br>
-                                {yoursiteurl}/index.php?route=extension/newsman/module/newsman.cronOrders&last-days=60&nzmhash={{ newsman_api_key }}
-                                <br><br>
-                                <a href="{{ export_subscribers }}" class="btn btn-info"><i class="fa-solid fa-upload"></i> {{ button_export_subscribers }}</a>
-                                <a href="{{ export_orders }}" class="btn btn-info ms-2"><i class="fa-solid fa-upload"></i> {{ button_export_orders }}</a>
-                                <a href="{{ export_orders_60_days }}" class="btn btn-info ms-2"><i class="fa-solid fa-upload"></i> {{ button_export_orders_60_days }}</a>
-                                <br><br>
-                                <a href="{{ reconfigure }}" class="btn btn-primary" onclick="return confirm('{{ text_reconfigure }} ?');"><i class="fa-solid fa-cog"></i> {{ button_reconfigure }}</a>
-                                <span style="font-size: 1.2em; vertical-align: middle; margin-left: 10px;"><b><i class="fa-solid fa-cog"></i> {{ text_config_for_store }}</b></span>
-                            </div>
+                        <div class="col-sm-10 offset-sm-2">
+                            <a href="{{ reconfigure }}" class="btn btn-primary" onclick="return confirm('{{ text_reconfigure }} ?');"><i class="fa-solid fa-cog"></i> {{ button_reconfigure }}</a>
+                            <span style="font-size: 1.2em; vertical-align: middle; margin-left: 10px;"><b><i class="fa-solid fa-cog"></i> {{ text_config_for_store }}</b></span>
                         </div>
                     </div>
                 </div>
