@@ -10,6 +10,7 @@ namespace Newsman;
  * @property \Opencart\Admin\Model\Extension\Newsman\Setting $model_extension_newsman_setting
  * @property \Opencart\Admin\Model\Setting\Event     $model_setting_event
  * @property \Opencart\Admin\Model\Setting\Setting   $model_setting_setting
+ * @property \Opencart\Admin\Model\Setting\Store     $model_setting_store
  */
 class Nzmsetup extends \Newsman\Library {
 	/**
@@ -18,7 +19,7 @@ class Nzmsetup extends \Newsman\Library {
 	 *
 	 * @var string
 	 */
-	protected $setup_version = '1.0.0';
+	protected $setup_version = '1.0.1';
 
 	/**
 	 * @param \Opencart\System\Engine\Registry $registry
@@ -60,6 +61,8 @@ class Nzmsetup extends \Newsman\Library {
 		$this->load->model('setting/setting');
 		$this->load->model('setting/event');
 		$this->model_setting_event = $this->registry->get('model_setting_event');
+		$this->load->model('setting/store');
+		$this->model_setting_store = $this->registry->get('model_setting_store');
 
 		$update = false;
 		foreach ($this->nzmconfig->getAllStoreIds() as $store_id) {
@@ -163,6 +166,15 @@ class Nzmsetup extends \Newsman\Library {
 			$this->model_extension_newsman_setting->editSetting(
 				'newsman',
 				array('newsman_setup_version' => '1.0.0'),
+				$store_id
+			);
+		}
+
+		if (version_compare($current_version, '1.0.1', '<')) {
+			$this->upgradeOptionsOneDotZeroDotOne($store_id);
+			$this->model_extension_newsman_setting->editSetting(
+				'newsman',
+				array('newsman_setup_version' => '1.0.1'),
 				$store_id
 			);
 		}
@@ -459,6 +471,115 @@ jt/modal_{{api_key}}.js';
 			'status'      => 1,
 			'sort_order'  => 1
 		]);
+	}
+
+	/**
+	 * Upgrade admin settings 1.0.1
+	 * Call SaveListIntegrationSetup for stores that have valid credentials configured.
+	 *
+	 * @param int $store_id
+	 *
+	 * @return void
+	 */
+	protected function upgradeOptionsOneDotZeroDotOne($store_id) {
+		if (!$this->nzmconfig->hasApiAccess($store_id)) {
+			return;
+		}
+
+		$list_id = $this->nzmconfig->getListId($store_id);
+		if (empty($list_id)) {
+			return;
+		}
+
+		$authenticate_token = $this->nzmconfig->getAuthenticateToken($store_id);
+		if (empty($authenticate_token)) {
+			$authenticate_token = $this->generateRandomPassword(32);
+			$this->model_extension_newsman_setting->editSetting(
+				'newsman',
+				array('newsman_authenticate_token' => $authenticate_token),
+				$store_id
+			);
+		}
+
+		$storefront_url = $this->getStorefrontUrl($store_id);
+
+		try {
+			$api_url = rtrim($storefront_url, '/') . 'index.php?route=extension/newsman/module/newsman.cart';
+
+			$version = new \Newsman\Util\Version($this->registry);
+			$payload = array(
+				'api_url'                   => $api_url,
+				'api_key'                   => $authenticate_token,
+				'plugin_version'            => $version->getVersion(),
+				'platform_version'          => VERSION,
+				'platform_language'         => 'PHP',
+				'platform_language_version' => phpversion(),
+			);
+
+			$context = new \Newsman\Service\Context\Configuration\SaveListIntegrationSetup();
+			$context->setUserId($this->nzmconfig->getUserId($store_id))
+				->setApiKey($this->nzmconfig->getApiKey($store_id))
+				->setListId($list_id)
+				->setIntegration('opencart4')
+				->setPayload($payload);
+
+			$service = new \Newsman\Service\Configuration\Integration\SaveListIntegrationSetup($this->registry);
+			$service->execute($context);
+		} catch (\Exception $e) {
+			// Do not block the upgrade on API failure.
+		}
+	}
+
+	/**
+	 * Get the storefront URL for a given store.
+	 *
+	 * @param int $store_id
+	 *
+	 * @return string
+	 */
+	protected function getStorefrontUrl($store_id) {
+		$url = defined('HTTPS_CATALOG') ? HTTPS_CATALOG : HTTP_CATALOG;
+
+		if ($store_id > 0) {
+			$store_info = $this->model_setting_store->getStore($store_id);
+			if ($store_info) {
+				$url = $store_info['url'];
+			}
+		}
+
+		return $url;
+	}
+
+	/**
+	 * Generate a random alphanumeric password.
+	 *
+	 * @param int $length
+	 *
+	 * @return string
+	 */
+	protected function generateRandomPassword($length = 16) {
+		$lowercase    = 'abcdefghijklmnopqrstuvwxyz';
+		$uppercase    = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+		$numbers      = '0123456789';
+		$all_chars    = $lowercase . $uppercase . $numbers;
+		$chars_length = strlen($all_chars);
+
+		$password = '';
+		for ($i = 0; $i < $length; $i++) {
+			$password .= $all_chars[random_int(0, $chars_length - 1)];
+		}
+
+		if (!preg_match('/[a-z]/', $password)) {
+			$password[random_int(0, $length - 1)] = $lowercase[random_int(0, strlen($lowercase) - 1)];
+		}
+		if (!preg_match('/[A-Z]/', $password)) {
+			$password[random_int(0, $length - 1)] = $uppercase[random_int(0, strlen($uppercase) - 1)];
+		}
+		if (!preg_match('/[0-9]/', $password)) {
+			$password[random_int(0, $length - 1)] = $numbers[random_int(0, strlen($numbers) - 1)];
+		}
+
+		return $password;
 	}
 
 	/**
