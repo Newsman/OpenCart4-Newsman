@@ -334,6 +334,7 @@ class Newsman extends \Opencart\System\Engine\Controller {
 			true,
 		);
 		if (is_array($result) && !empty($result['feed_id'])) {
+			$this->session->data['success'] = 'Products feed installed in Newsman.';
 			$auth_name = $this->generateRandomHeaderName();
 			$auth_value = $this->generateRandomPassword();
 			$result = $this->updateFeedAuthorize(
@@ -354,6 +355,8 @@ class Newsman extends \Opencart\System\Engine\Controller {
 					$this->store_id
 				);
 			}
+		} else {
+			$this->session->data['warning'] = 'Products feed could not be installed. It may already exist in Newsman.';
 		}
 
 		$this->response->redirect($this->url->link('extension/newsman/module/newsman', [
@@ -642,6 +645,11 @@ class Newsman extends \Opencart\System\Engine\Controller {
 		if (!empty($this->session->data['error'])) {
 			$data['error'] = $this->session->data['error'];
 			unset($this->session->data['error']);
+		}
+
+		if (!empty($this->session->data['warning'])) {
+			$data['warning'] = $this->session->data['warning'];
+			unset($this->session->data['warning']);
 		}
 
 		if (!$this->user->hasPermission('modify', 'extension/newsman/module/newsman')) {
