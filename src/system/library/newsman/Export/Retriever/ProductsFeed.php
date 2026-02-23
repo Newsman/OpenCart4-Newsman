@@ -1,6 +1,6 @@
 <?php
 
-namespace newsman\Export\Retriever;
+namespace Newsman\Export\Retriever;
 
 /**
  * Class Export Retriever Products Feed
