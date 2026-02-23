@@ -325,6 +325,7 @@ class Newsman extends \Opencart\System\Engine\Controller {
 			return;
 		}
 
+		// @deprecated
 		$url = $this->getStorefrontUrl() . "index.php?route=extension/newsman/module/newsman.cart&newsman=products.json&nzmhash=" . $api_key;
 		$result = $this->setFeedOnList(
 			$list_id,
@@ -337,6 +338,7 @@ class Newsman extends \Opencart\System\Engine\Controller {
 			$this->session->data['success'] = 'Products feed installed in Newsman.';
 			$auth_name = $this->generateRandomHeaderName();
 			$auth_value = $this->generateRandomPassword();
+			// @deprecated
 			$result = $this->updateFeedAuthorize(
 				$list_id,
 				$result['feed_id'],
