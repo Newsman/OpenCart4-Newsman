@@ -8,22 +8,23 @@ NewsMAN Plugin for OpenCart 4 facilitates seamless synchronization of your OpenC
 
 ## Newsman Sync
 
-Manual installation:
-1. Create an archive named newsman.ocmod.zip with the contents of the "src/" folder from this GitHub repository.
-2. Go to Extensions -> Installer -> Upload newsman.ocmod.zip.
-3. Navigate to admin -> Extensions -> Extension -> Choose extension type -> Modules -> click the "Install" button for NewsMAN module.
-4. Navigate to admin -> Extensions -> Extensions -> Choose extension type -> Analytics -> NewsMAN Remarketing -> click the "Install" button for NewsMAN Remarketing module.
-5. After installation, edit "NewsMAN" module.
-6. At this step you will need to click on the "Login with NewsMAN" button and follow the 3 steps to complete the configuration:
+Manual installation (we'll change the installation method in near future):
+1. Download the Github repository archive (top right Code > Download Zip). Go to downloaded directory 'src/system/library/newsman/'. Run `composer install --no-dev` or `composer dump-autoload -o` to add the dependencies of this extension.
+2. Create an archive named newsman.ocmod.zip with the contents of the "src/" folder from this GitHub repository.
+3. Go to Extensions -> Installer -> Upload newsman.ocmod.zip.
+4. Navigate to Admin -> Extensions -> Extension -> Choose extension type -> Modules -> click the "Install" button for NewsMAN module.
+5. Navigate to Admin -> Extensions -> Extensions -> Choose extension type -> Analytics -> NewsMAN Remarketing -> click the "Install" button for NewsMAN Remarketing module.
+6. After installation, click "Edit" button for "NewsMAN" module from Admin -> Extensions -> Extension -> Choose extension type -> Modules.
+7. At this step you will need to click on the "Login with NewsMAN" button and follow the 3 steps to complete the configuration:
 * Authenticate in newsman.app.
 * Allow access to your NewsMAN account in your store.
 * Configure the email list and save the settings.
-7. If there are any errors, repeat the configuration using "Login with NewsMAN". Also you can check OpenCart logs for more information in `storage/logs/newsman_*.log``.
+8. If there are any errors, repeat the configuration using "Login with NewsMAN". Also you can check OpenCart logs for more information in `storage/logs/newsman_*.log``.
 You can increase the log level from extension configuration in Admin -> Newsman -> Settings -> Developer Settings -> Log level.
 
 Additional steps:
-1. Look in Admin > Newsman > * configurations for preffered changes.
-2. Check the storefront for Newsman remarketing JavaScript code.
+1. Look in Admin > Newsman > * configurations for preferred changes.
+2. Verify the storefront for Newsman remarketing JavaScript code.
 3. You can also use the debugger in newsman.app > Integrations > NewsMAN Remarketing > "Check installation" button.
 The debugger is similar to Google GTM debugger and shows if the events are tracked correctly by NewsMAN remarketing.
 
