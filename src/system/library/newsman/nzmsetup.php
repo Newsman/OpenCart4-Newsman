@@ -504,7 +504,7 @@ jt/modal_{{api_key}}.js';
 		$storefront_url = $this->getStorefrontUrl($store_id);
 
 		try {
-			$api_url = rtrim($storefront_url, '/') . 'index.php?route=extension/newsman/module/newsman';
+			$api_url = rtrim($storefront_url, '/') . '/index.php?route=extension/newsman/module/newsman';
 
 			$version = new \Newsman\Util\Version($this->registry);
 			$payload = array(

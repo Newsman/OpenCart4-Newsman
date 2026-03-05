@@ -456,7 +456,7 @@ class Newsman extends \Opencart\System\Engine\Controller {
 				$api_key = $this->nzmconfig->getApiKey($this->store_id);
 			}
 
-			$api_url = rtrim($storefront_url, '/') . 'index.php?route=extension/newsman/module/newsman';
+			$api_url = rtrim($storefront_url, '/') . '/index.php?route=extension/newsman/module/newsman';
 
 			$version = new \Newsman\Util\Version($this->registry);
 			$payload = array(
