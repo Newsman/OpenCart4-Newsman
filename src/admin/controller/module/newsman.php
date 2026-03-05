@@ -474,7 +474,7 @@ class Newsman extends \Opencart\System\Engine\Controller {
 			$context->setUserId($user_id)
 				->setApiKey($api_key)
 				->setListId($list_id)
-				->setIntegration('opencart4')
+				->setIntegration('opencart')
 				->setPayload($payload);
 
 			$service = new \Newsman\Service\Configuration\Integration\SaveListIntegrationSetup($this->registry);
