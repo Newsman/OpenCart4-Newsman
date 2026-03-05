@@ -326,7 +326,7 @@ class Newsman extends \Opencart\System\Engine\Controller {
 		}
 
 		// @deprecated
-		// $url = $this->getStorefrontUrl() . "index.php?route=extension/newsman/module/newsman.cart&newsman=products.json&nzmhash=" . $api_key;
+		// $url = $this->getStorefrontUrl() . "index.php?route=extension/newsman/module/newsman&newsman=products.json&nzmhash=" . $api_key;
 		// $result = $this->setFeedOnList(
 		// 	$list_id,
 		// 	$url,
@@ -456,7 +456,7 @@ class Newsman extends \Opencart\System\Engine\Controller {
 				$api_key = $this->nzmconfig->getApiKey($this->store_id);
 			}
 
-			$api_url = rtrim($storefront_url, '/') . 'index.php?route=extension/newsman/module/newsman.cart';
+			$api_url = rtrim($storefront_url, '/') . 'index.php?route=extension/newsman/module/newsman';
 
 			$version = new \Newsman\Util\Version($this->registry);
 			$payload = array(
