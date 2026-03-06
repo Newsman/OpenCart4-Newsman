@@ -231,6 +231,11 @@ class Newsmanremarketing extends \Opencart\System\Engine\Controller {
 			}
 		}
 
+		$data['logo'] = HTTP_CATALOG . 'extension/newsman/admin/view/image/newsman-logo.png';
+		$version = new \Newsman\Util\Version($this->registry);
+		$data['extension_version'] = $version->getVersion();
+		$data['text_extension_version'] = $this->language->get('text_extension_version');
+
 		$this->response->setOutput($this->load->view('extension/newsman/analytics/newsmanremarketing', $data));
 	}
 

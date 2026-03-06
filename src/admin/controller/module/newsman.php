@@ -118,6 +118,10 @@ class Newsman extends \Opencart\System\Engine\Controller {
 		$data = $this->load->language('extension/newsman/module/newsman');
 
 		$data['heading_title'] = $this->language->get('heading_title');
+		$data['logo'] = HTTP_CATALOG . 'extension/newsman/admin/view/image/newsman-logo.png';
+		$version = new \Newsman\Util\Version($this->registry);
+		$data['extension_version'] = $version->getVersion();
+		$data['text_extension_version'] = $this->language->get('text_extension_version');
 		$data['breadcrumbs'] = $this->breadcrumbs();
 		$data['oauth_url'] = $this->getOauthUrl();
 
@@ -159,6 +163,10 @@ class Newsman extends \Opencart\System\Engine\Controller {
 		$data['show_retry_button'] = false;
 
 		$data['heading_title'] = $this->language->get('heading_title');
+		$data['logo'] = HTTP_CATALOG . 'extension/newsman/admin/view/image/newsman-logo.png';
+		$version = new \Newsman\Util\Version($this->registry);
+		$data['extension_version'] = $version->getVersion();
+		$data['text_extension_version'] = $this->language->get('text_extension_version');
 		$data['breadcrumbs'] = $this->breadcrumbs();
 		$data['oauth_url'] = $this->getOauthUrl();
 
@@ -811,6 +819,8 @@ class Newsman extends \Opencart\System\Engine\Controller {
 		$data['header'] = $this->load->controller('common/header');
 		$data['column_left'] = $this->load->controller('common/column_left');
 		$data['footer'] = $this->load->controller('common/footer');
+
+		$data['logo'] = HTTP_CATALOG . 'extension/newsman/admin/view/image/newsman-logo.png';
 
 		$this->response->setOutput($this->load->view('extension/newsman/module/newsman', $data));
 	}

@@ -6,8 +6,8 @@
                 <button type="submit" form="form-newsman" data-bs-toggle="tooltip" title="{{ button_save }}" class="btn btn-primary"><i class="fa-solid fa-save"></i></button>
                 <a href="{{ cancel }}" data-bs-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-light"><i class="fa-solid fa-reply"></i></a>
             </div>
-            <h1>{{ heading_title }}</h1>
-            <div class="form-text">{{ text_extension_version }}: {{ extension_version }}</div>
+            <h1><img src="{{ logo }}" alt="{{ heading_title }}" style="height: 30px;" /></h1>
+            <div class="form-text"><a href="https://www.newsman.com/" target="_blank">www.newsman.com</a></div>
             <ol class="breadcrumb">
                 {% for breadcrumb in breadcrumbs %}
                     <li class="breadcrumb-item"><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
@@ -71,6 +71,12 @@
                                     <strong style="color: #D2042D;">{{ text_credentials_invalid }}</strong>
                                 {% endif %}
                             </div>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label class="col-sm-2 col-form-label">{{ text_extension_version }}</label>
+                        <div class="col-sm-10">
+                            <div class="col-form-label text-start">{{ extension_version }}</div>
                         </div>
                     </div>
                     <div class="row mb-3">
