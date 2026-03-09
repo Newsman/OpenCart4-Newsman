@@ -6,55 +6,30 @@ NewsMAN Plugin for OpenCart 4 facilitates seamless synchronization of your OpenC
 
 # Installation
 
-## Newsman Sync
-
-Manual installation (we'll change the installation method in near future):
-1. Download the Github repository archive (top right Code > Download Zip). Go to downloaded directory 'src/system/library/newsman/'. Run `composer install --no-dev` or `composer dump-autoload -o` to add the dependencies of this extension.
-2. Create an archive named newsman.ocmod.zip with the contents of the "src/" folder from this GitHub repository.
-3. Go to Extensions -> Installer -> Upload newsman.ocmod.zip.
-4. Navigate to Admin -> Extensions -> Extension -> Choose extension type -> Modules -> click the "Install" button for NewsMAN module.
-5. Navigate to Admin -> Extensions -> Extensions -> Choose extension type -> Analytics -> NewsMAN Remarketing -> click the "Install" button for NewsMAN Remarketing module.
-6. After installation, click "Edit" button for "NewsMAN" module from Admin -> Extensions -> Extension -> Choose extension type -> Modules.
-7. At this step you will need to click on the "Login with NewsMAN" button and follow the 3 steps to complete the configuration:
+## Manual installation (download archive and upload):
+1. Download the latest **newsman.ocmod.zip** archive from [releases](https://github.com/Newsman/OpenCart4-Newsman/releases) (Git tags 4.x.x-autoload, link in the right sidebar here on GitHub). The archive newsman.ocmod.zip contains the plugin and has the generated `system/library/newsman/vendor/autoload.php` which is required in non-composer Opencart 4 installations.
+2. Go to Extensions -> Installer -> Upload newsman.ocmod.zip. Click on "install" button (square with a plus sign).
+3. Navigate to Admin -> Extensions -> Extension -> Choose extension type -> Modules -> click the "Install" button for NewsMAN module.
+4. Navigate to Admin -> Extensions -> Extensions -> Choose extension type -> Analytics -> NewsMAN Remarketing -> click the "Install" button for NewsMAN Remarketing module.
+5. After installation, click the "Edit" button for the "NewsMAN" module from Admin -> Extensions -> Extension -> Choose extension type -> Modules.
+6. At this step you will need to click on the "Login with NewsMAN" button and follow the 3 steps to complete the configuration:
 * Authenticate in newsman.app.
 * Allow access to your NewsMAN account in your store.
 * Configure the email list and save the settings.
-8. If there are any errors, repeat the configuration using "Login with NewsMAN". Also you can check OpenCart logs for more information in `storage/logs/newsman_*.log``.
+7. If there are any errors, repeat the configuration using "Login with NewsMAN". Also you can check OpenCart logs for more information in `storage/logs/newsman_*.log``.
 You can increase the log level from extension configuration in Admin -> Newsman -> Settings -> Developer Settings -> Log level.
 
-Additional steps:
+## Additional steps:
 1. Look in Admin > Newsman > * configurations for preferred changes.
 2. Verify the storefront for Newsman remarketing JavaScript code.
 3. You can also use the debugger in newsman.app > Integrations > NewsMAN Remarketing > "Check installation" button.
 The debugger is similar to Google GTM debugger and shows if the events are tracked correctly by NewsMAN remarketing.
 
-## Newsman Remarketing
-
-~~1. Extensions -> Installer -> Upload NewsMANremarketing.ocmod.zip~~
-~~2. Extensions -> Modifications -> Refresh~~
-~~3. Extensions -> Extensions -> Analytics -> NewsMAN Remarketing~~
-
-# Setup
-
-## Newsman Sync
-
-The process is automated; log in with NewsMAN via OAuth, and the settings will be filled automatically based on your selection.
-
-![image](https://raw.githubusercontent.com/Newsman/OpenCart2.3-Newsman/master/assets/oauth1.png)
-![image](https://raw.githubusercontent.com/Newsman/OpenCart2.3-Newsman/master/assets/oauth2.png)
-
-![](https://raw.githubusercontent.com/Newsman/OpenCart3-Newsman/master/assets/api-setup-screen-opencart3.png)
-
-2.Choose a list for your newsletter subscribers by setting up your user ID and API key.
-
-For automatic synchronization, set up a webcron to run the URL:  {yoursiteurl}/index.php?route=extension/module/NewsMAN&cron=true
-
-## Newsman Remarketing
-
-1. Fill in your Newsman Remarketing ID and save
-![](https://raw.githubusercontent.com/Newsman/OpenCart3-Newsman/master/assets/nr1.png)
-
-Upon installation, the plugin provides feed products and events (product impressions, AddToCart, purchase) automatically.
+## Manual installation (create archive from source):
+1. Download from Github repository > top right corner "Code" > Download ZIP. Unarchive the downloaded file.
+2. Go to downloaded directory 'src/system/library/newsman/'. Run `composer install --no-dev` or `composer dump-autoload -o` to add the dependencies of this extension.
+3. Create an archive named newsman.ocmod.zip with only the contents of the "src/*" folder.
+4. Please do the steps from above "Manual installation (download archive and upload)" from step 2 including to the end.
 
 Description
 
