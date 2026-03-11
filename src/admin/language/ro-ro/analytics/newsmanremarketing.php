@@ -23,6 +23,11 @@ $_['entry_anonymize_ip'] = 'Anonimizează Adresa IP';
 $_['entry_send_telephone'] = 'Trimite numărul de telefon';
 $_['entry_order_date'] = 'Data minimă a comenzii';
 
+// Theme compatibility
+$_['entry_theme_event_inject'] = 'Mod compatibilitate temă';
+$_['help_theme_event_inject'] = 'Activați dacă tema dvs. nu afișează scripturile de remarketing. Când este activat, scripturile de remarketing sunt injectate printr-un eveniment OpenCart în loc să depindă de temă pentru a le afișa.';
+$_['text_theme_event_inject_warning'] = 'După modificarea acestei setări, verificați sursa paginii magazinului pentru a confirma că scripturile de remarketing apar exact o singură dată. Activarea pe o temă care deja afișează analytics poate duce la scripturi de remarketing duplicate.';
+
 // Error
 $_['error_permission'] = 'Avertisment: Nu aveți permisiunea de a modifica NewsMAN Remarketing!';
 $_['error_code'] = 'ID-ul de urmărire este obligatoriu!';

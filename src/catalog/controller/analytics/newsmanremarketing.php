@@ -40,6 +40,24 @@ class Newsmanremarketing extends \Opencart\System\Engine\Controller {
 		}
 	}
 
+	/**
+	 * Event handler for catalog/view/common/header/after.
+	 * Injects remarketing scripts for themes that do not render analytics output.
+	 *
+	 * @param string $route
+	 * @param array  $args
+	 * @param string $output
+	 *
+	 * @return void
+	 */
+	public function eventHeaderAfter(string &$route, array &$args, string &$output): void {
+		$remarketing_output = $this->index();
+
+		if (!empty($remarketing_output)) {
+			$output .= $remarketing_output;
+		}
+	}
+
 	public function index(): string {
 		if (!$this->nzmconfig->isRemarketingActive()) {
 			return '';

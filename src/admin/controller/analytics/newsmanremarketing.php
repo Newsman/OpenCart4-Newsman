@@ -62,7 +62,13 @@ class Newsmanremarketing extends \Opencart\System\Engine\Controller {
 		'trackingid',
 		'anonymize_ip',
 		'send_telephone',
+		'theme_event_inject',
 	);
+
+	/**
+	 * @var string
+	 */
+	protected $event_code = 'newsman_remarketing_header_inject';
 
 	/**
 	 * @param \Opencart\System\Engine\Registry $registry
@@ -184,6 +190,11 @@ class Newsmanremarketing extends \Opencart\System\Engine\Controller {
 			}
 			$this->load->model('extension/newsman/setting');
 			$this->model_extension_newsman_setting->editSetting($this->names['setting'], $settings, $this->store_id);
+
+			$this->syncThemeEventInject(
+				!empty($this->request->post[$this->names['setting'] . '_theme_event_inject'])
+			);
+
 			$this->session->data['success'] = $this->language->get('text_success');
 			$this->response->redirect($this->url->link($this->location['module'], [
 				$this->names['token'] => $this->session->data[$this->names['token']],
@@ -258,6 +269,30 @@ class Newsmanremarketing extends \Opencart\System\Engine\Controller {
 		} catch (\Exception $e) {
 			$this->nzmlogger->logException($e);
 			return false;
+		}
+	}
+
+	/**
+	 * Add or remove the remarketing header inject event based on the toggle.
+	 *
+	 * @param bool $enabled
+	 *
+	 * @return void
+	 */
+	protected function syncThemeEventInject(bool $enabled): void {
+		$this->load->model('setting/event');
+
+		$this->model_setting_event->deleteEventByCode($this->event_code);
+
+		if ($enabled) {
+			$this->model_setting_event->addEvent([
+				'code'        => $this->event_code,
+				'description' => 'Newsman remarketing script injection for themes that do not render analytics',
+				'trigger'     => 'catalog/view/common/header/after',
+				'action'      => 'extension/newsman/analytics/newsmanremarketing.eventHeaderAfter',
+				'status'      => 1,
+				'sort_order'  => 99
+			]);
 		}
 	}
 

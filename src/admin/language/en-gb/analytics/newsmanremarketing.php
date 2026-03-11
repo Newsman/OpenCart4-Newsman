@@ -23,6 +23,11 @@ $_['entry_anonymize_ip'] = 'Anonymize IP Address';
 $_['entry_send_telephone'] = 'Send Phone Number';
 $_['entry_order_date'] = 'Minimum Order Date';
 
+// Theme compatibility
+$_['entry_theme_event_inject'] = 'Theme Compatibility Mode';
+$_['help_theme_event_inject'] = 'Enable this if your theme does not render remarketing scripts. When enabled, the remarketing scripts are injected via an OpenCart event instead of relying on the theme to output them.';
+$_['text_theme_event_inject_warning'] = 'After changing this setting, check your storefront page source to verify the remarketing scripts appear exactly once. Enabling this on a theme that already renders analytics may result in duplicate remarketing scripts.';
+
 // Error
 $_['error_permission'] = 'Warning: You do not have permission to modify NewsMAN Remarketing!';
 $_['error_code'] = 'Tracking ID required!';
