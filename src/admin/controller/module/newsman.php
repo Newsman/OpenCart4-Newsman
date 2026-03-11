@@ -717,7 +717,10 @@ class Newsman extends \Opencart\System\Engine\Controller {
 			$previous_api_key = $data['newsman_api_key'];
 			$settings = array();
 			foreach ($this->field_names as $field) {
-				$settings[$this->names['setting'] . '_' . $field] = $this->request->post[$this->names['setting'] . '_' . $field];
+				$settings[$this->names['setting'] . '_' . $field] = '';
+				if (isset($this->request->post[$this->names['setting'] . '_' . $field])) {
+					$settings[$this->names['setting'] . '_' . $field] = $this->request->post[$this->names['setting'] . '_' . $field];
+				}
 			}
 			$settings_status = array(
 				'module_newsman_status' => $this->request->post['module_newsman_status']
