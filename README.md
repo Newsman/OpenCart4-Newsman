@@ -34,7 +34,7 @@ Some third-party themes do not render the default OpenCart analytics output in t
 3. Create an archive named newsman.ocmod.zip with only the contents of the "src/*" folder.
 4. Please do the steps from above "Manual installation (download archive and upload)" from step 2 including to the end.
 
-Description
+## Description
 
 The NewsMAN Plugin for OpenCart 4 empowers you to streamline email and SMS marketing efforts, offering features like subscription forms, contact list management, newsletters, email campaigns, SMS functionalities, smart automations, and detailed analytics. Access these capabilities through the NewsMAN platform for enhanced marketing efficiency.
 
