@@ -25,6 +25,9 @@ You can increase the log level from extension configuration in Admin -> Newsman 
 3. You can also use the debugger in newsman.app > Integrations > NewsMAN Remarketing > "Check installation" button.
 The debugger is similar to Google GTM debugger and shows if the events are tracked correctly by NewsMAN remarketing.
 
+## Theme Compatibility Mode (Remarketing)
+Some third-party themes do not render the default OpenCart analytics output in their templates. If your remarketing scripts are not appearing on the storefront, go to Admin -> Extensions -> Extensions -> Analytics -> NewsMAN Remarketing and enable the **Theme Compatibility Mode** option. When enabled, the remarketing scripts are injected via an OpenCart event instead of relying on the theme to output them. After changing this setting, check your storefront page source to verify the remarketing scripts appear exactly once to avoid duplicate scripts.
+
 ## Manual installation (create archive from source):
 1. Download from Github repository > top right corner "Code" > Download ZIP. Unarchive the downloaded file.
 2. Go to downloaded directory 'src/system/library/newsman/'. Run `composer install --no-dev` or `composer dump-autoload -o` to add the dependencies of this extension.
