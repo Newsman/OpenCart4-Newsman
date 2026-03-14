@@ -109,6 +109,10 @@ class Pool extends \Newsman\Nzmbase {
 		'sql-version'      => array(
 			'code'  => 'sql-version',
 			'class' => '\Newsman\Export\Retriever\SqlVersion'
+		),
+		'refresh-remarketing' => array(
+			'code'  => 'refresh-remarketing',
+			'class' => '\Newsman\Export\Retriever\RefreshRemarketing'
 		)
 	);
 
