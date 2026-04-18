@@ -614,6 +614,21 @@ class Nzmconfig extends Library {
 	}
 
 	/**
+	 * Is theme cart compatibility enabled (defaults to enabled when unset).
+	 *
+	 * @param null|int $store_id
+	 *
+	 * @return bool
+	 */
+	public function isThemeCartCompatibility($store_id = null) {
+		$value = $this->getConfigValue('analytics_newsmanremarketing_theme_cart_compatibility', $store_id);
+		if ($value === null || $value === '') {
+			return true;
+		}
+		return (bool)$value;
+	}
+
+	/**
 	 * Get order date to export orders created after it, including.
 	 *
 	 * @deprecated No longer configured via admin UI.

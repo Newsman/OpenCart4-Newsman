@@ -21,6 +21,8 @@ $_['entry_tracking'] = 'ID Remarketing NewsMAN';
 $_['entry_status'] = 'Status';
 $_['entry_anonymize_ip'] = 'Anonimizează Adresa IP';
 $_['entry_send_telephone'] = 'Trimite numărul de telefon';
+$_['entry_theme_cart_compatibility'] = 'Compatibilitate Coș Temă';
+$_['entry_theme_cart_compatibility_help'] = 'Activați pentru cea mai fiabilă detectare a modificărilor coșului pe orice temă (folosește polling în fundal și ascultă cererile AJAX/fetch). Dezactivați pentru a folosi un mecanism mai ușor care citește conținutul coșului direct din blocul standard de minicart al temei OpenCart 4 (fără polling în fundal, dar funcționează doar dacă tema dvs. folosește blocul standard de minicart <code>#cart</code>). Dacă dezactivați această opțiune, goliți cache-ul OpenCart și apoi folosiți instrumentul <strong>Check installation</strong> Remarketing din newsman.app pentru a verifica dacă evenimentele coșului sunt detectate corect.';
 $_['entry_order_date'] = 'Data minimă a comenzii';
 
 // Theme compatibility

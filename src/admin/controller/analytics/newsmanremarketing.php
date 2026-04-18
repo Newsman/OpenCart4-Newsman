@@ -63,6 +63,7 @@ class Newsmanremarketing extends \Opencart\System\Engine\Controller {
 		'anonymize_ip',
 		'send_telephone',
 		'theme_event_inject',
+		'theme_cart_compatibility',
 	);
 
 	/**
@@ -180,6 +181,11 @@ class Newsmanremarketing extends \Opencart\System\Engine\Controller {
 
 		foreach ($this->field_names as $field) {
 			$data[$this->names['setting'] . '_' . $field] = $this->model_setting_setting->getValue($this->names['setting'] . '_' . $field, $this->store_id);
+		}
+
+		$tcc_key = $this->names['setting'] . '_theme_cart_compatibility';
+		if ($data[$tcc_key] === null || $data[$tcc_key] === '') {
+			$data[$tcc_key] = 1;
 		}
 
 		if (strcasecmp($this->request->server['REQUEST_METHOD'], 'POST') == 0 && $this->validate()) {

@@ -21,6 +21,8 @@ $_['entry_tracking'] = 'ID NewsMAN Remarketing';
 $_['entry_status'] = 'Stato';
 $_['entry_anonymize_ip'] = 'Anonimizza indirizzo IP';
 $_['entry_send_telephone'] = 'Invia numero di telefono';
+$_['entry_theme_cart_compatibility'] = 'Compatibilità Carrello Tema';
+$_['entry_theme_cart_compatibility_help'] = 'Abilita per il rilevamento più affidabile delle modifiche al carrello su qualsiasi tema (utilizza polling in background e ascolta le richieste AJAX/fetch). Disabilita per utilizzare un meccanismo più leggero che legge il contenuto del carrello direttamente dal blocco minicart predefinito del tema OpenCart 4 (nessun polling in background, ma funziona solo se il tuo tema utilizza il blocco minicart standard <code>#cart</code>). Se disabiliti questa opzione, svuota la cache di OpenCart e poi utilizza lo strumento <strong>Check installation</strong> Remarketing di newsman.app per verificare che gli eventi del carrello siano rilevati correttamente.';
 $_['entry_order_date'] = 'Data ordine minima';
 
 // Theme compatibility

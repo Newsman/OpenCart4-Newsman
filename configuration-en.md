@@ -107,6 +107,11 @@ Remarketing lets Newsman track what pages and products your visitors view, so yo
 
 - **Send Phone Number** - Include customer phone numbers in remarketing data. Only applies to logged-in customers who have provided a phone number. Enabled by default.
 
+- **Theme Cart Compatibility** - Controls how the remarketing pixel detects cart changes. Enabled by default.
+  - **Enabled** - Uses background polling and listens to AJAX/fetch requests to detect cart changes. This is the most reliable mode and works on every theme, but it generates extra background requests on every page.
+  - **Disabled** - A lighter mode that reads the cart contents directly from OpenCart 4's default minicart block (`#cart`). No background polling, but it only works if your theme uses the standard minicart block.
+  - **Note:** If you disable this option, clear your OpenCart cache and then use the newsman.app Remarketing **Check installation** tool to verify that cart add/remove/clear events are being detected correctly on your theme.
+
 - **Theme Compatibility Mode** - Some third-party themes do not render the default OpenCart analytics output in their templates. If your remarketing scripts are not appearing on the storefront, enable this option. When enabled, the remarketing scripts are injected via an OpenCart event instead of relying on the theme to output them. After changing this setting, check your storefront page source to verify the remarketing scripts appear exactly once to avoid duplicate scripts.
 
 ### What Gets Tracked

@@ -15,6 +15,8 @@ namespace Opencart\Catalog\Controller\Extension\Newsman\Analytics;
  * @property \Opencart\System\Engine\Config           $config
  * @property \Opencart\System\Library\Request         $request
  * @property \Opencart\System\Library\Cart\Customer   $customer
+ * @property \Opencart\System\Library\Cart\Cart        $cart
+ * @property \Opencart\System\Library\Cart\Tax         $tax
  * @property \Opencart\System\Library\DB              $db
  * @property \Opencart\Catalog\Model\Catalog\Product   $model_catalog_product
  * @property \Opencart\Catalog\Model\Catalog\Category  $model_catalog_category
@@ -127,8 +129,12 @@ class Newsmanremarketing extends \Opencart\System\Engine\Controller {
 			$data['nzm_time_diff'] = 1000;
 		}
 
+		$template = $this->nzmconfig->isThemeCartCompatibility()
+			? 'extension/newsman/analytics/newsman/cart'
+			: 'extension/newsman/analytics/newsman/minicart';
+
 		$this->event->trigger('newsmanremarketing/script_cart_render/before', array(&$data));
-		$output = $this->load->view('extension/newsman/analytics/newsman/cart', $data);
+		$output = $this->load->view($template, $data);
 		$this->event->trigger('newsmanremarketing/script_cart_render/after', array(&$data, &$output));
 
 		return $output;
@@ -279,5 +285,72 @@ class Newsmanremarketing extends \Opencart\System\Engine\Controller {
 		$this->event->trigger('newsmanremarketing/remarketing_get_current_route/after', array(&$route));
 
 		return $route;
+	}
+
+	/**
+	 * Event handler for catalog/view/common/cart/after.
+	 *
+	 * Appends a JSON payload of the current cart products to the rendered minicart
+	 * HTML so that the minicart-DOM-based tracker (minicart.twig) can read it
+	 * without parsing theme markup.
+	 *
+	 * Skipped when Theme Cart Compatibility is enabled (cart.twig handles tracking
+	 * via XHR/fetch interception in that mode).
+	 *
+	 * @param string $route
+	 * @param array  $args
+	 * @param string $output
+	 *
+	 * @return void
+	 */
+	public function eventViewCommonCartAfter(string &$route, array &$args, string &$output): void {
+		if (!$this->nzmconfig->isRemarketingActive()) {
+			return;
+		}
+		if ($this->nzmconfig->isThemeCartCompatibility()) {
+			return;
+		}
+
+		$products = array();
+		try {
+			$cart_products = $this->cart->getProducts();
+		} catch (\Exception $e) {
+			return;
+		}
+
+		$show_price = ($this->customer->isLogged() || !$this->config->get('config_customer_price'));
+
+		foreach ($cart_products as $product) {
+			$price = 0.0;
+			if ($show_price && isset($product['price'], $product['tax_class_id'])) {
+				$unit_price = $this->tax->calculate(
+					$product['price'],
+					$product['tax_class_id'],
+					$this->config->get('config_tax')
+				);
+				$price = (float)$unit_price;
+			}
+
+			$products[] = array(
+				'id'       => isset($product['product_id']) ? (string)$product['product_id'] : '',
+				'name'     => isset($product['name']) ? (string)$product['name'] : '',
+				'price'    => $price,
+				'quantity' => isset($product['quantity']) ? (int)$product['quantity'] : 0,
+			);
+		}
+
+		$json = json_encode(
+			$products,
+			JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
+		);
+		if ($json === false) {
+			return;
+		}
+
+		// Append the JSON inside the cart response. The OC4 default theme refreshes
+		// the minicart via $('#cart').load(common/cart.info), which replaces the
+		// entire #cart contents with the response body. By appending the tag here it
+		// ends up inside #cart on both initial render and subsequent AJAX refreshes.
+		$output .= '<script type="application/json" data-newsman-cart>' . $json . '</script>';
 	}
 }
