@@ -101,7 +101,6 @@ class Newsmanremarketing extends \Opencart\System\Engine\Controller {
 		$data['tracking_script_js'] = $track->getScript();
 
 		$data['tag_attrib'] = $this->getScripTagAttributes();
-		$data['nzm_run'] = $track->escapeHtml($this->nzmconfig->getJsTrackRunFunc());
 		$data['is_anonymize_ip'] = $this->nzmconfig->isAnonymizeIp();
 
 		$no_track_script = '';
