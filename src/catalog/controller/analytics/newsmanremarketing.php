@@ -129,15 +129,35 @@ class Newsmanremarketing extends \Opencart\System\Engine\Controller {
 			$data['nzm_time_diff'] = 1000;
 		}
 
-		$template = $this->nzmconfig->isThemeCartCompatibility()
-			? 'extension/newsman/analytics/newsman/cart'
-			: 'extension/newsman/analytics/newsman/minicart';
+		if ($this->nzmconfig->isThemeCartCompatibility()) {
+			$template = 'extension/newsman/analytics/newsman/cart';
+		} else {
+			$template = 'extension/newsman/analytics/newsman/minicart';
+			$data['nzm_cookie_path'] = $this->getCartCookiePath();
+		}
 
 		$this->event->trigger('newsmanremarketing/script_cart_render/before', array(&$data));
 		$output = $this->load->view($template, $data);
 		$this->event->trigger('newsmanremarketing/script_cart_render/after', array(&$data, &$output));
 
 		return $output;
+	}
+
+	/**
+	 * Scope of the nzm_cart_sync session cookie used by minicart.twig's
+	 * bootstrap. Derived from HTTP_SERVER so multistore installs running
+	 * under a subpath (e.g. https://example.com/shop/) do not share one
+	 * session flag with sibling stores on the same domain.
+	 *
+	 * @return string
+	 */
+	protected function getCartCookiePath(): string {
+		$path = parse_url(HTTP_SERVER, PHP_URL_PATH);
+		if (!is_string($path) || $path === '' || $path[0] !== '/') {
+			return '/';
+		}
+
+		return $path;
 	}
 
 	protected function getPageViewJs(): string {
