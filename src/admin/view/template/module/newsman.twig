@@ -166,6 +166,38 @@
                             <div class="form-text">{{ text_export_authorize_header_key_help }}</div>
                         </div>
                     </div>
+                    <div class="row mb-3">
+                        <label class="col-sm-2 col-form-label" for="input-feed-image-generate">{{ entry_feed_image_generate }}</label>
+                        <div class="col-sm-10">
+                            <select name="newsman_feed_image_generate" id="input-feed-image-generate" class="form-select">
+                                <option value="0" {% if not newsman_feed_image_generate %}selected{% endif %}>{{ text_disabled }}</option>
+                                <option value="1" {% if newsman_feed_image_generate %}selected{% endif %}>{{ text_enabled }}</option>
+                            </select>
+                            <div class="form-text">{{ entry_feed_image_generate_help }}</div>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label class="col-sm-2 col-form-label" for="input-feed-image-custom-size">{{ entry_feed_image_custom_size }}</label>
+                        <div class="col-sm-10">
+                            <select name="newsman_feed_image_custom_size" id="input-feed-image-custom-size" class="form-select">
+                                <option value="0" {% if not newsman_feed_image_custom_size %}selected{% endif %}>{{ text_disabled }}</option>
+                                <option value="1" {% if newsman_feed_image_custom_size %}selected{% endif %}>{{ text_enabled }}</option>
+                            </select>
+                            <div class="form-text">{{ entry_feed_image_custom_size_help }}</div>
+                        </div>
+                    </div>
+                    <div class="row mb-3" id="row-feed-image-width">
+                        <label class="col-sm-2 col-form-label" for="input-feed-image-width">{{ entry_feed_image_width }}</label>
+                        <div class="col-sm-10">
+                            <input type="number" min="0" name="newsman_feed_image_width" value="{{ newsman_feed_image_width }}" placeholder="{{ entry_feed_image_width }}" id="input-feed-image-width" class="form-control">
+                        </div>
+                    </div>
+                    <div class="row mb-3" id="row-feed-image-height">
+                        <label class="col-sm-2 col-form-label" for="input-feed-image-height">{{ entry_feed_image_height }}</label>
+                        <div class="col-sm-10">
+                            <input type="number" min="0" name="newsman_feed_image_height" value="{{ newsman_feed_image_height }}" placeholder="{{ entry_feed_image_height }}" id="input-feed-image-height" class="form-control">
+                        </div>
+                    </div>
                     {% if is_multistore %}
                     <div class="row mb-3">
                         <label class="col-sm-2 col-form-label" for="input-export-subscribers-by-store">{{ entry_export_subscribers_by_store }}</label>
@@ -267,11 +299,19 @@ $(document).ready(function() {
         } else {
             $('#input-developer-user-ip').parent().parent().show();
         }
+
+        if ($('#input-feed-image-custom-size').val() == '0') {
+            $('#row-feed-image-width').hide();
+            $('#row-feed-image-height').hide();
+        } else {
+            $('#row-feed-image-width').show();
+            $('#row-feed-image-height').show();
+        }
     }
 
     toggleSettings();
 
-    $('#input-send-user-ip, #input-checkout-newsletter, #input-developer-active-user-ip').on('change', function() {
+    $('#input-send-user-ip, #input-checkout-newsletter, #input-developer-active-user-ip, #input-feed-image-custom-size').on('change', function() {
         toggleSettings();
     });
 });

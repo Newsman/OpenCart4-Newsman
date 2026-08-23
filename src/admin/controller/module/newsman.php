@@ -70,7 +70,11 @@ class Newsman extends \Opencart\System\Engine\Controller {
 		'developer_active_user_ip',
 		'developer_user_ip',
 		'export_subscribers_by_store',
-		'export_customers_by_store'
+		'export_customers_by_store',
+		'feed_image_generate',
+		'feed_image_custom_size',
+		'feed_image_width',
+		'feed_image_height'
 	);
 
 	/**

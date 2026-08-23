@@ -71,6 +71,18 @@ Go to **Admin > Extensions > Modules > NewsMAN > Edit** to configure the core ex
 
 - **Export Authorize Header Name / Key** - This is a legacy option for protecting your data exports with custom security credentials. If you connected via OAuth, you do not need to set these - the extension handles authentication automatically. You only need to fill these in if you set up the connection manually and want to add an extra layer of security to data exports.
 
+### Products Feed Images
+
+These settings control the product image URLs sent in the products feed to Newsman.
+
+By default, the feed links the resized product image from `image/cache/` only when that file already exists on the server, and falls back to the original image otherwise. Products without an image (or whose image file is missing from the server) use the store placeholder image.
+
+- **Products Feed: Generate Missing Images** - When enabled, the resized product image is created on the server during the feed export if it does not exist yet (the same way the storefront creates it). The first feed read after enabling can take longer while missing images are generated. Disabled by default.
+
+- **Products Feed: Custom Image Size** - When enabled, the feed uses the width and height below instead of the theme popup image size. Useful for themes that do not use the standard OpenCart theme image size settings — set the values to match the image size configured in your theme. Disabled by default.
+
+- **Products Feed: Image Width** / **Products Feed: Image Height** - The custom dimensions in pixels, used only when Custom Image Size is enabled.
+
 ### Multi-Store Options
 
 These settings are only visible if you have multiple stores configured in OpenCart.
