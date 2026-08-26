@@ -368,13 +368,26 @@ class Newsmanremarketing extends \Opencart\System\Engine\Controller {
 		}
 
 		// The session keeps the fingerprint of the cart last reported to Newsman
-		// (see the extension/newsman/module/newsman.cart endpoint). Exposing it
-		// on the payload lets the tracking script skip re-reporting a cart this
-		// session already reported, even when its localStorage fingerprint was
+		// (see the extension/newsman/module/newsman.cart endpoint); for logged-in
+		// customers it is also persisted in the newsman_reported_cart table.
+		// Exposing it on the payload lets the tracking script skip re-reporting
+		// a cart already reported, even when its localStorage fingerprint was
 		// lost.
 		$hash = md5($json);
 		$reported = isset($this->session->data['newsman_reported_cart_hash']) &&
 			$this->session->data['newsman_reported_cart_hash'] === $hash;
+
+		if (!$reported && $this->customer->isLogged()) {
+			$reported_cart = new \Newsman\Nzmreportedcart($this->registry);
+			$reported = $reported_cart->isReported(
+				$this->customer->getId(),
+				(int)$this->config->get('config_store_id'),
+				$hash
+			);
+			if ($reported) {
+				$this->session->data['newsman_reported_cart_hash'] = $hash;
+			}
+		}
 
 		// Append the JSON inside the cart response. The OC4 default theme refreshes
 		// the minicart via $('#cart').load(common/cart.info), which replaces the
