@@ -89,18 +89,22 @@ class Newsman extends \Opencart\System\Engine\Controller {
 	 * Get cart items AJAX action.
 	 *
 	 * The server keeps a fingerprint (hash) of the cart contents last reported
-	 * to Newsman in the OpenCart session. It is one half of the duplicate
-	 * abandoned-cart guard: the client keeps its own durable fingerprint in
-	 * localStorage, and the cart is reported again only when BOTH sides lost
-	 * track of it — which genuinely looks like a new visitor.
+	 * to Newsman in the OpenCart session, and for logged-in customers also in
+	 * the newsman_reported_cart table, so the guard survives a new session or
+	 * a change of device. It is one half of the duplicate abandoned-cart
+	 * guard: the client keeps its own durable fingerprint in localStorage,
+	 * and the cart is reported again only when BOTH sides lost track of it —
+	 * which genuinely looks like a new visitor.
 	 *
 	 * - GET (legacy, no "v" parameter): bare JSON array of cart items, kept for
 	 *   cached copies of the old tracking script.
 	 * - GET with v=2: {"items": [...], "hash": "<md5>", "reported": bool} where
 	 *   "reported" tells whether this exact cart was already reported to
-	 *   Newsman during this session.
+	 *   Newsman by this session or, for logged-in customers, by any earlier
+	 *   session recorded in the database.
 	 * - POST with reported_hash=<md5>: the tracking script confirms it has
-	 *   reported the cart; the hash is stored in the session.
+	 *   reported the cart; the hash is stored in the session (and in the
+	 *   database when the customer is logged in).
 	 */
 	public function cart(): void {
 		header('Access-Control-Allow-Origin: *');
@@ -113,6 +117,16 @@ class Newsman extends \Opencart\System\Engine\Controller {
 			$hash = (string)$this->request->post['reported_hash'];
 			if (preg_match('/^[a-f0-9]{32}$/i', $hash)) {
 				$this->session->data['newsman_reported_cart_hash'] = strtolower($hash);
+
+				if ($this->customer->isLogged()) {
+					$reported_cart = new \Newsman\Nzmreportedcart($this->registry);
+					$reported_cart->set(
+						$this->customer->getId(),
+						(int)$this->config->get('config_store_id'),
+						$hash
+					);
+				}
+
 				echo json_encode(array('ok' => true));
 			} else {
 				echo json_encode(array('ok' => false));
@@ -135,6 +149,18 @@ class Newsman extends \Opencart\System\Engine\Controller {
 			$hash = md5(json_encode($items));
 			$reported = isset($this->session->data['newsman_reported_cart_hash']) &&
 				$this->session->data['newsman_reported_cart_hash'] === $hash;
+
+			if (!$reported && $this->customer->isLogged()) {
+				$reported_cart = new \Newsman\Nzmreportedcart($this->registry);
+				$reported = $reported_cart->isReported(
+					$this->customer->getId(),
+					(int)$this->config->get('config_store_id'),
+					$hash
+				);
+				if ($reported) {
+					$this->session->data['newsman_reported_cart_hash'] = strtolower($hash);
+				}
+			}
 
 			echo json_encode(
 				array(
