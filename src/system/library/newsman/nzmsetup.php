@@ -19,7 +19,7 @@ class Nzmsetup extends \Newsman\Library {
 	 *
 	 * @var string
 	 */
-	protected $setup_version = '1.0.4';
+	protected $setup_version = '1.0.5';
 
 	/**
 	 * @param \Opencart\System\Engine\Registry $registry
@@ -123,6 +123,9 @@ class Nzmsetup extends \Newsman\Library {
 		$this->model_setting_event->deleteEventByCode('newsman_admin_menu_before');
 
 		$this->model_setting_event->deleteEventByCode('newsman_view_common_cart_after');
+
+		$reported_cart = new \Newsman\Nzmreportedcart($this->registry);
+		$reported_cart->dropTable();
 	}
 
 	/**
@@ -211,6 +214,27 @@ class Nzmsetup extends \Newsman\Library {
 				$store_id
 			);
 		}
+
+		if (version_compare($current_version, '1.0.5', '<')) {
+			$this->upgradeOptionsOneDotZeroDotFive($store_id);
+			$this->model_extension_newsman_setting->editSetting(
+				'newsman',
+				array('newsman_setup_version' => '1.0.5'),
+				$store_id
+			);
+		}
+	}
+
+	/**
+	 * Upgrade admin settings 1.0.5
+	 *
+	 * @param int $store_id
+	 *
+	 * @return void
+	 */
+	protected function upgradeOptionsOneDotZeroDotFive($store_id) {
+		$reported_cart = new \Newsman\Nzmreportedcart($this->registry);
+		$reported_cart->createTable();
 	}
 
 	/**
