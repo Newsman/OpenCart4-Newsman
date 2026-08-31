@@ -276,6 +276,37 @@ class Newsman extends \Opencart\System\Engine\Controller {
 		}
 	}
 
+	/**
+	 * Runs on every order status change that goes through the checkout order
+	 * model, whichever code path writes the history row: the store API behind
+	 * the admin order pages, the storefront payment confirmation, a payment
+	 * gateway callback or a courier extension. It replaces the history_add
+	 * branch of the api/order event, which saw only the changes made from the
+	 * admin order pages.
+	 *
+	 * @param string $route
+	 * @param array  $args Arguments addHistory() was called with.
+	 * @param mixed  $output
+	 *
+	 * @return void
+	 */
+	public function eventCheckoutOrderHistoryAfter(string &$route, array &$args, mixed &$output): void {
+		if (empty($args[0])) {
+			return;
+		}
+
+		$order_id = (int)$args[0];
+		// Fall back to the status stored on the order when none was passed.
+		$order_status_id = (!empty($args[1])) ? (int)$args[1] : false;
+
+		try {
+			$status_action = new \Newsman\Action\Order\Status($this->registry);
+			$status_action->execute($order_id, $order_status_id);
+		} catch (\Exception $e) {
+			$this->nzmlogger->logException($e);
+		}
+	}
+
 	public function eventApiOrderAfter(string &$route, array &$args): void {
 		$order_id = null;
 		if (isset($this->request->get['order_id'])) {
@@ -293,14 +324,6 @@ class Newsman extends \Opencart\System\Engine\Controller {
 		}
 
 		switch($call) {
-			case 'history_add':
-				$order_status_id = (isset($this->request->post['order_status_id'])) ? (int)$this->request->post['order_status_id'] : false;
-				if ($order_status_id) {
-					$status = new \Newsman\Action\Order\Status($this->registry);
-					$status->execute($order_id, $order_status_id, false);
-				}
-			break;
-
 			case 'confirm':
 				$save_order = new \Newsman\Action\Order\Save($this->registry);
 				$save_order->execute($order_id, false);

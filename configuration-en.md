@@ -71,6 +71,14 @@ Go to **Admin > Extensions > Modules > NewsMAN > Edit** to configure the core ex
 
 - **Export Authorize Header Name / Key** - This is a legacy option for protecting your data exports with custom security credentials. If you connected via OAuth, you do not need to set these - the extension handles authentication automatically. You only need to fill these in if you set up the connection manually and want to add an extra layer of security to data exports.
 
+### Order Status Reporting
+
+When an order is placed and every time its status changes afterwards, the extension reports the order status to Newsman. OpenCart status names are translated first: statuses listed in **System > Settings > edit store > Option > Checkout > Complete Order Status** are reported as `complete`, statuses listed in **Processing Order Status** are reported as `processing`, and any other status is sent to Newsman under its own name in lower case (`shipped`, `comanda expediata`, and so on).
+
+- **Order Statuses Reported as Complete** - Tick the statuses that Newsman should treat as a completed purchase, in addition to the ones in the store's Complete Order Status setting. Use it when the final status of an order in your shop is one the store itself does not count as complete - a shipped or handed-to-courier status, for example, or a courier-specific status added by a shipping extension. Nothing is ticked by default, and the store setting is never overridden - the two lists are merged.
+
+- **Order Statuses Reported as Processing** - Tick the statuses that Newsman should treat as a purchase in progress, in addition to the ones in the store's Processing Order Status setting. A status ticked as complete wins over one ticked here. Nothing is ticked by default.
+
 ### Products Feed Images
 
 These settings control the product image URLs sent in the products feed to Newsman.

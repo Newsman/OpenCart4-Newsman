@@ -14,6 +14,16 @@ class Status extends \Newsman\Nzmbase {
 	protected $checkout_order;
 
 	/**
+	 * Last status sent to Newsman during this request, keyed by order ID.
+	 *
+	 * Only a repeat of the status last sent for that order is dropped, so a
+	 * genuine change back and forth still reports.
+	 *
+	 * @var array
+	 */
+	protected static $sent = array();
+
+	/**
 	 * Constructor
 	 *
 	 * @param \Opencart\System\Engine\Registry $registry
@@ -28,8 +38,9 @@ class Status extends \Newsman\Nzmbase {
 	/**
 	 * Execute
 	 *
-	 * @param int  $order_id Order ID.
-	 * @param bool $is_new
+	 * @param int      $order_id Order ID.
+	 * @param int|bool $order_status_id Status to report, or false to use the one stored on the order.
+	 * @param bool     $is_new
 	 *
 	 * @return void
 	 */
@@ -57,6 +68,10 @@ class Status extends \Newsman\Nzmbase {
 			$mapper = new \Newsman\Export\Order\Status\Mapper($this->registry);
 			$order_status = $mapper->map($order_status_id, $order_status_name, $store_id, $is_new);
 
+			if (isset(self::$sent[$order_id]) && self::$sent[$order_id] === $order_status) {
+				return;
+			}
+
 			$context = new \Newsman\Service\Context\Remarketing\SetPurchaseStatus();
 			$context->setListId($this->config->getListId())
 				->setOrderId($order_id)
@@ -64,6 +79,8 @@ class Status extends \Newsman\Nzmbase {
 
 			$purchase = new \Newsman\Service\Remarketing\SetPurchaseStatus($this->registry);
 			$purchase->execute($context);
+
+			self::$sent[$order_id] = $order_status;
 
 		} catch (\Exception $e) {
 			$this->logger->error($e->getMessage());
