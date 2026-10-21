@@ -225,7 +225,7 @@ class AbstractAction extends \Newsman\Nzmbase {
 		$return = [
 			"id"       => $product["product_id"],
 			"name"     => $product["name"],
-			"sku"      => $oc_product["sku"],
+			"sku"      => $this->getProductSku($product["product_id"], $oc_product),
 			"brand"    => $oc_product["manufacturer"] ?? ($oc_product["brand"] ?? ''),
 			"category" => $oc_category["path"],
 			"variant"  => $product["variant"],
@@ -234,6 +234,27 @@ class AbstractAction extends \Newsman\Nzmbase {
 		];
 
 		return $return;
+	}
+
+	/**
+	 * Product SKU. OpenCart 4.1 keeps the product identifiers in the product_code table,
+	 * and 4.1.0.4 drops the old sku column from the product table.
+	 *
+	 * @param int   $product_id
+	 * @param array $oc_product
+	 *
+	 * @return string
+	 */
+	protected function getProductSku($product_id, $oc_product) {
+		if (version_compare(VERSION, '4.1.0.0', '>=')) {
+			foreach ($this->getProductModel()->getCodes((int)$product_id) as $code) {
+				if (strtoupper($code['code']) == 'SKU') {
+					return $code['value'];
+				}
+			}
+		}
+
+		return $oc_product['sku'] ?? '';
 	}
 
 	/**

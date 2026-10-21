@@ -48,7 +48,7 @@ class Email extends \Newsman\Nzmbase {
 	 * @return void
 	 * @throws \Exception Error exceptions or other.
 	 */
-	public function execute($email, $firstname, $lastname, $properties = array(), $options = array(), $store_id) {
+	public function execute($email, $firstname, $lastname, $properties, $options, $store_id) {
 		$this->subscribe($email, $firstname, $lastname, $properties, $options, $store_id);
 	}
 
@@ -65,7 +65,7 @@ class Email extends \Newsman\Nzmbase {
 	 * @return void
 	 * @throws \Exception Error exceptions or other.
 	 */
-	public function subscribe($email, $firstname, $lastname, $properties = array(), $options = array(), $store_id) {
+	public function subscribe($email, $firstname, $lastname, $properties, $options, $store_id) {
 		if (empty($email) || !$this->isAllow($store_id)) {
 			return;
 		}
@@ -90,7 +90,7 @@ class Email extends \Newsman\Nzmbase {
 	 * @return void
 	 * @throws \Exception Error exceptions or other.
 	 */
-	public function subscribeDoubleOptin($email, $firstname, $lastname, $properties = array(), $options = array(), $store_id) {
+	public function subscribeDoubleOptin($email, $firstname, $lastname, $properties, $options, $store_id) {
 		$context = new \Newsman\Service\Context\InitSubscribeEmail();
 		$context->setListId($this->config->getListId($store_id))
 			->setStoreId($store_id)
@@ -122,7 +122,7 @@ class Email extends \Newsman\Nzmbase {
 	 * @return void
 	 * @throws \Exception Error exceptions or other.
 	 */
-	public function subscribeSingleOptin($email, $firstname, $lastname, $properties = array(), $options = array(), $store_id) {
+	public function subscribeSingleOptin($email, $firstname, $lastname, $properties, $options, $store_id) {
 		$context = new \Newsman\Service\Context\SubscribeEmail();
 		$context->setListId($this->config->getListId($store_id))
 			->setStoreId($store_id)

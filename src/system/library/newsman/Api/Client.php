@@ -283,8 +283,6 @@ class Client extends \Newsman\Nzmbase implements ClientInterface {
 
 		$http_status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
-		curl_close($ch);
-
 		if (isset($buffer) && is_resource($buffer)) {
 			fclose($buffer);
 		}

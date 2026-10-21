@@ -28,6 +28,27 @@ class Nzmconfig extends Library {
 	public const NAMESPACE_REMARKETING = 'analytics_newsmanremarketing';
 
 	/**
+	 * Events registered on a route without a method. The OpenCart upgrade script adds a
+	 * method separator to every trigger that has no dot (common/cart becomes common.cart),
+	 * and such a trigger no longer matches the route.
+	 */
+	public const ROUTE_EVENT_TRIGGERS = array(
+		'newsman_upgrade_setup_sale_order_info'      => 'admin/view/sale/order_info/before',
+		'newsman_upgrade_setup_catalog_product_form' => 'admin/view/catalog/product_form/before',
+		'newsman_upgrade_setup_dashboard'            => 'admin/view/common/dashboard/before',
+		'newsman_upgrade_setup_module'               => 'admin/view/extension/newsman/module/newsman/before',
+		'newsman_clean_logs_sale_order_info'         => 'admin/view/sale/order_info/before',
+		'newsman_clean_logs_catalog_product_form'    => 'admin/view/catalog/product_form/before',
+		'newsman_clean_logs_dashboard'               => 'admin/view/common/dashboard/before',
+		'newsman_clean_logs_module'                  => 'admin/view/extension/newsman/module/newsman/before',
+		'newsman_admin_menu_before'                  => 'admin/view/common/column_left/before',
+		'newsman_api_order_after'                    => 'catalog/controller/api/order/after',
+		'newsman_checkout_success_before'            => 'catalog/controller/checkout/success/before',
+		'newsman_catalog_cron_gdpr_before'           => 'catalog/controller/cron/gdpr/before',
+		'newsman_view_common_cart_after'             => 'catalog/view/common/cart/after',
+	);
+
+	/**
 	 * Cached store IDs
 	 *
 	 * @var array
@@ -75,6 +96,9 @@ class Nzmconfig extends Library {
 		$this->load->model('setting/setting');
 		$this->load->model('setting/store');
 
+		$this->restoreSettingsRenamedByUpgrade();
+		$this->restoreEventsRenamedByUpgrade();
+
 		$store_id = $this->config->get('config_store_id');
 		if ($store_id === null) {
 			$store_id = 0;
@@ -114,6 +138,66 @@ class Nzmconfig extends Library {
 			);
 			$this->config_loaded[$a_store_id] = true;
 		}
+	}
+
+	/**
+	 * The OpenCart upgrade script prefixes every setting whose code equals an installed
+	 * extension code with the extension type, so after a core upgrade the newsman_* settings
+	 * are stored as module_newsman_* and the extension looks unconfigured. Rename them back.
+	 *
+	 * @return void
+	 */
+	public function restoreSettingsRenamedByUpgrade() {
+		if (!$this->config->has('module_newsman_api_url') && !$this->config->has('module_newsman_setup_version')) {
+			return;
+		}
+
+		$current_store_id = $this->getCurrentStoreId();
+		$prefix = self::NAMESPACE_MODULE_NEWSMAN . '_';
+
+		$query = $this->db->query("SELECT `setting_id`, `store_id`, `key`, `value`, `serialized` FROM `" . DB_PREFIX . "setting` WHERE `code` = '" . self::NAMESPACE_MODULE_NEWSMAN . "' AND `key` LIKE 'module\\_newsman\\_%' AND `key` != 'module_newsman_status' ORDER BY `store_id` ASC");
+
+		foreach ($query->rows as $row) {
+			$key = self::NAMESPACE_NEWSMAN . '_' . substr($row['key'], strlen($prefix));
+			$value = $row['serialized'] ? json_decode($row['value'], true) : $row['value'];
+
+			// Keep a value saved after the core upgrade, it is newer than the renamed one.
+			$existing = $this->db->query("SELECT `setting_id`, `value` FROM `" . DB_PREFIX . "setting` WHERE `store_id` = '" . (int)$row['store_id'] . "' AND `key` = '" . $this->db->escape($key) . "'");
+			if ($existing->num_rows && $existing->row['value'] !== '') {
+				$this->db->query("DELETE FROM `" . DB_PREFIX . "setting` WHERE `setting_id` = '" . (int)$row['setting_id'] . "'");
+			} else {
+				if ($existing->num_rows) {
+					$this->db->query("DELETE FROM `" . DB_PREFIX . "setting` WHERE `setting_id` = '" . (int)$existing->row['setting_id'] . "'");
+				}
+				$this->db->query("UPDATE `" . DB_PREFIX . "setting` SET `code` = '" . self::NAMESPACE_NEWSMAN . "', `key` = '" . $this->db->escape($key) . "' WHERE `setting_id` = '" . (int)$row['setting_id'] . "'");
+
+				if ((int)$row['store_id'] === 0 || (int)$row['store_id'] === $current_store_id) {
+					$this->config->set($key, $value);
+				}
+			}
+
+			$this->config->set($row['key'], null);
+		}
+	}
+
+	/**
+	 * Put back the ROUTE_EVENT_TRIGGERS triggers changed by an OpenCart core upgrade.
+	 * Runs once per OpenCart version.
+	 *
+	 * @return void
+	 */
+	public function restoreEventsRenamedByUpgrade() {
+		if ($this->config->get('newsman_events_core_version') === VERSION) {
+			return;
+		}
+
+		foreach (self::ROUTE_EVENT_TRIGGERS as $code => $trigger) {
+			$this->db->query("UPDATE `" . DB_PREFIX . "event` SET `trigger` = '" . $this->db->escape($trigger) . "' WHERE `code` = '" . $this->db->escape($code) . "' AND `trigger` != '" . $this->db->escape($trigger) . "'");
+		}
+
+		$this->db->query("DELETE FROM `" . DB_PREFIX . "setting` WHERE `store_id` = '0' AND `key` = 'newsman_events_core_version'");
+		$this->db->query("INSERT INTO `" . DB_PREFIX . "setting` SET `store_id` = '0', `code` = '" . self::NAMESPACE_NEWSMAN . "', `key` = 'newsman_events_core_version', `value` = '" . $this->db->escape(VERSION) . "'");
+		$this->config->set('newsman_events_core_version', VERSION);
 	}
 
 	/**

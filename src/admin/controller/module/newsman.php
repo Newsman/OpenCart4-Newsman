@@ -289,7 +289,6 @@ class Newsman extends \Opencart\System\Engine\Controller {
 			$data['show_retry_button'] = true;
 			$data['error'] .= ' Response error: ' . curl_error($ch);
 		}
-		curl_close($ch);
 
 		if ($response !== false) {
 			$response = json_decode($response);

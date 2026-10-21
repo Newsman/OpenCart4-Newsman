@@ -105,7 +105,6 @@ class HostIpAddress extends \Newsman\Nzmbase {
 		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
 		curl_exec($ch);
 		$ip = curl_getinfo($ch, CURLINFO_PRIMARY_IP);
-		curl_close($ch);
 
 		if (empty($ip) || '127.0.0.1' === $ip) {
 			return '';
