@@ -63,6 +63,8 @@ Go to **Admin > Extensions > Modules > NewsMAN > Edit** to configure the core ex
 
 - **Double Opt-in** - When enabled (the default), new subscribers receive a confirmation email and must click a link to confirm their subscription. This is recommended for GDPR compliance. When disabled, subscribers are added to the list immediately.
 
+- **Anonymise in NewsMAN when customers are deleted** - When enabled (the default), deleting a customer in **Admin > Customers > Customers** anonymises the email address in Newsman. When disabled, the email address is only unsubscribed from the list of this store (no confirmation email is sent). See "What happens in Newsman when I delete a customer or process a GDPR removal request?" in the questions below.
+
 - **Send User IP Address** - When enabled, the visitor's IP address is sent to Newsman when they subscribe or unsubscribe. This can help with analytics and compliance. When disabled, the **Server IP** address is sent instead.
 
 - **Server IP** - A fallback IP address used when "Send User IP Address" is turned off. You can usually leave this empty.
@@ -184,6 +186,8 @@ The extension asks Newsman to anonymise the email address. Newsman replaces it w
 
 - you delete customers in **Admin > Customers > Customers** (one or several at once);
 - the OpenCart GDPR cron job (**Admin > Extensions > Cron Jobs**, code `gdpr`) processes a removal request you approved in **Admin > Customers > GDPR**. Approving only marks the request; OpenCart deletes the customer when the cron job runs, and the email address is anonymised at that moment, also when it has no customer account (for example a guest). Export requests send nothing to Newsman.
+
+The **Anonymise in NewsMAN when customers are deleted** setting (on by default) is read for each store: on the list of a store where it is turned off, the email address of a deleted customer is only unsubscribed (no confirmation email is sent). When stores with different values use the same Newsman list, the email address is only unsubscribed on that list. The setting does not apply to GDPR removal requests: they are always anonymised.
 
 How it works:
 

@@ -132,6 +132,16 @@
                         </div>
                     </div>
                     <div class="row mb-3">
+                        <label class="col-sm-2 col-form-label" for="input-anonymise-on-customer-delete">{{ entry_anonymise_on_customer_delete }}</label>
+                        <div class="col-sm-10">
+                            <div class="form-check form-switch form-switch-lg">
+                                <input type="hidden" name="newsman_anonymise_on_customer_delete" value="0"/>
+                                <input type="checkbox" name="newsman_anonymise_on_customer_delete" value="1" id="input-anonymise-on-customer-delete" class="form-check-input"{% if newsman_anonymise_on_customer_delete %} checked{% endif %}/>
+                            </div>
+                            <div class="form-text">{{ entry_anonymise_on_customer_delete_help }}</div>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
                         <label class="col-sm-2 col-form-label" for="input-send-user-ip">{{ entry_send_user_ip }}</label>
                         <div class="col-sm-10">
                             <div class="form-check form-switch form-switch-lg">

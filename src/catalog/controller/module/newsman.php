@@ -62,7 +62,8 @@ class Newsman extends \Opencart\System\Engine\Controller {
 	/**
 	 * Anonymises in Newsman the emails of the GDPR removal requests that the GDPR cron is about to process
 	 * (it deletes the customer), on the lists of all stores, whatever the newsletter status and also
-	 * when there is no customer account. An approved export request is completed by the admin approval
+	 * when there is no customer account. The setting "Anonymise in Newsman when customers are deleted"
+	 * does not apply: a removal request is always anonymised. An approved export request is completed by the admin approval
 	 * and never reaches the cron, but it is skipped here too.
 	 *
 	 * @param string $route

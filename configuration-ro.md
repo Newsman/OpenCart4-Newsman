@@ -63,6 +63,8 @@ Accesati **Admin > Extensions > Modules > NewsMAN > Edit** pentru a configura co
 
 - **Double Opt-in** - Cand este activat (valoarea implicita), noii abonati primesc un email de confirmare si trebuie sa faca click pe un link pentru a-si confirma abonarea. Aceasta optiune este recomandata pentru conformitatea GDPR. Cand este dezactivat, abonatii sunt adaugati imediat in lista.
 
+- **Anonymise in NewsMAN when customers are deleted** - Cand este activat (valoarea implicita), stergerea unui client din **Admin > Customers > Customers** anonimizeaza adresa de email in Newsman. Cand este dezactivat, adresa de email este doar dezabonata din lista acestui magazin (nu se trimite email de confirmare). Vedeti "Ce se intampla in Newsman cand sterg un client sau procesez o cerere GDPR de stergere?" in intrebarile de mai jos.
+
 - **Send User IP Address** - Cand este activat, adresa IP a vizitatorului este trimisa catre Newsman cand se aboneaza sau dezaboneaza. Acest lucru poate ajuta la analiza si conformitate. Cand este dezactivat, se trimite in schimb adresa **Server IP**.
 
 - **Server IP** - O adresa IP de rezerva folosita cand "Send User IP Address" este dezactivat. De obicei puteti lasa acest camp gol.
@@ -184,6 +186,8 @@ Extensia cere Newsman sa anonimizeze adresa de email. Newsman o inlocuieste cu u
 
 - stergeti clienti din **Admin > Customers > Customers** (unul sau mai multi deodata);
 - cron job-ul GDPR al OpenCart (**Admin > Extensions > Cron Jobs**, codul `gdpr`) proceseaza o cerere de stergere aprobata de dvs. in **Admin > Customers > GDPR**. Aprobarea doar marcheaza cererea; OpenCart sterge clientul cand ruleaza cron job-ul, iar adresa de email este anonimizata in acel moment, si atunci cand nu are cont de client (de exemplu un vizitator). Cererile de export nu trimit nimic catre Newsman.
+
+Setarea **Anonymise in NewsMAN when customers are deleted** (activata implicit) se citeste pentru fiecare magazin: in lista unui magazin unde este dezactivata, adresa de email a clientului sters este doar dezabonata (nu se trimite email de confirmare). Cand magazine cu valori diferite folosesc aceeasi lista Newsman, adresa de email este doar dezabonata din acea lista. Setarea nu se aplica cererilor GDPR de stergere: acestea sunt anonimizate intotdeauna.
 
 Cum functioneaza:
 

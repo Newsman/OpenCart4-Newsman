@@ -60,6 +60,7 @@ class Newsman extends \Opencart\System\Engine\Controller {
 		'list_id',
 		'segment',
 		'newsletter_double_optin',
+		'anonymise_on_customer_delete',
 		'send_user_ip',
 		'server_ip',
 		'export_authorize_header_name',
@@ -93,6 +94,16 @@ class Newsman extends \Opencart\System\Engine\Controller {
 	);
 
 	/**
+	 * Default values of the module settings that are not empty by default. A store that
+	 * never saved the setting uses its default, so no upgrade step is needed.
+	 *
+	 * @var array
+	 */
+	protected $default_field_values = array(
+		'anonymise_on_customer_delete' => '1'
+	);
+
+	/**
 	 * Get a module setting value as stored in the database.
 	 *
 	 * @param string $field Field name without the setting prefix.
@@ -101,6 +112,10 @@ class Newsman extends \Opencart\System\Engine\Controller {
 	 */
 	protected function getStoredFieldValue($field) {
 		$value = $this->model_setting_setting->getValue($this->names['setting'] . '_' . $field, $this->store_id);
+
+		if (($value === null || $value === '') && isset($this->default_field_values[$field])) {
+			return $this->default_field_values[$field];
+		}
 
 		if (!in_array($field, $this->array_field_names, true)) {
 			return $value;
@@ -123,6 +138,10 @@ class Newsman extends \Opencart\System\Engine\Controller {
 
 		if (isset($this->request->post[$key])) {
 			return $this->request->post[$key];
+		}
+
+		if (isset($this->default_field_values[$field])) {
+			return $this->default_field_values[$field];
 		}
 
 		return in_array($field, $this->array_field_names, true) ? array() : '';
@@ -1157,7 +1176,8 @@ class Newsman extends \Opencart\System\Engine\Controller {
 
 	/**
 	 * Anonymises the email of every deleted customer in Newsman, whatever the newsletter status,
-	 * on the lists of all stores (customers are shared by all stores).
+	 * on the lists of all stores (customers are shared by all stores). A list used by a store with
+	 * "Anonymise in Newsman when customers are deleted" off gets an unsubscribe instead.
 	 *
 	 * @param string $route
 	 * @param array  $args
@@ -1184,7 +1204,7 @@ class Newsman extends \Opencart\System\Engine\Controller {
 			$customer_info = $this->model_customer_customer->getCustomer((int)$customer_id);
 
 			if ($customer_info && !empty($customer_info['email'])) {
-				$this->anonymise($customer_info['email']);
+				$this->anonymiseOrUnsubscribe($customer_info['email']);
 			}
 		}
 	}
@@ -1232,10 +1252,10 @@ class Newsman extends \Opencart\System\Engine\Controller {
 		}
 	}
 
-	private function anonymise(string $email): void {
+	private function anonymiseOrUnsubscribe(string $email): void {
 		try {
 			$anonymise = new \Newsman\Action\Anonymise\Email($this->registry);
-			$anonymise->execute($email);
+			$anonymise->executeCustomerDelete($email);
 		} catch (\Throwable $e) {
 			if ($this->registry->has('nzmlogger')) {
 				$this->nzmlogger->logException($e);
