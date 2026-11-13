@@ -59,17 +59,36 @@ class Newsman extends \Opencart\System\Engine\Controller {
 		$this->response->setOutput($this->load->view('extension/newsman/module/newsman', $data));
 	}
 
+	/**
+	 * Anonymises in Newsman the emails of the GDPR removal requests that the GDPR cron is about to process
+	 * (it deletes the customer), on the lists of all stores, whatever the newsletter status and also
+	 * when there is no customer account. An approved export request is completed by the admin approval
+	 * and never reaches the cron, but it is skipped here too.
+	 *
+	 * @param string $route
+	 * @param array  $args
+	 *
+	 * @return void
+	 */
 	public function eventCronGdprBefore(string &$route, array &$args): void {
-		$this->load->model('account/gdpr');
-		$this->load->model('account/customer');
+		try {
+			$this->load->model('account/gdpr');
+			$this->load->model('account/customer');
 
-		$results = $this->model_account_gdpr->getExpires();
+			$results = $this->model_account_gdpr->getExpires();
 
-		foreach ($results as $result) {
-			$customer_info = $this->model_account_customer->getCustomerByEmail($result['email']);
+			foreach ($results as $result) {
+				if (!isset($result['action']) || $result['action'] !== 'remove' || empty($result['email'])) {
+					continue;
+				}
 
-			if ($customer_info) {
-				$this->unsubscribe($customer_info['email'], (int)$customer_info['store_id']);
+				$customer_info = $this->model_account_customer->getCustomerByEmail($result['email']);
+
+				$this->anonymise($customer_info ? $customer_info['email'] : $result['email']);
+			}
+		} catch (\Throwable $e) {
+			if ($this->registry->has('nzmlogger')) {
+				$this->nzmlogger->logException($e);
 			}
 		}
 	}
@@ -79,6 +98,17 @@ class Newsman extends \Opencart\System\Engine\Controller {
 			$email_action = new \Newsman\Action\Subscribe\Email($this->registry);
 			$email_action->unsubscribe($email, $store_id);
 		} catch (\Exception $e) {
+			if ($this->registry->has('nzmlogger')) {
+				$this->nzmlogger->logException($e);
+			}
+		}
+	}
+
+	private function anonymise(string $email): void {
+		try {
+			$anonymise = new \Newsman\Action\Anonymise\Email($this->registry);
+			$anonymise->execute($email);
+		} catch (\Throwable $e) {
 			if ($this->registry->has('nzmlogger')) {
 				$this->nzmlogger->logException($e);
 			}

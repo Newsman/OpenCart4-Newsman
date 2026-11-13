@@ -1155,10 +1155,24 @@ class Newsman extends \Opencart\System\Engine\Controller {
 		}
 	}
 
+	/**
+	 * Anonymises the email of every deleted customer in Newsman, whatever the newsletter status,
+	 * on the lists of all stores (customers are shared by all stores).
+	 *
+	 * @param string $route
+	 * @param array  $args
+	 *
+	 * @return void
+	 */
 	public function eventDeleteCustomerBefore(string &$route, array &$args): void {
 		$this->nzmloader->autoload();
 
 		if (!isset($this->request->post['selected'])) {
+			return;
+		}
+
+		// The same permission check as the delete itself, which runs after this event.
+		if (!$this->user->hasPermission('modify', 'customer/customer')) {
 			return;
 		}
 
@@ -1169,8 +1183,8 @@ class Newsman extends \Opencart\System\Engine\Controller {
 		foreach ($selected as $customer_id) {
 			$customer_info = $this->model_customer_customer->getCustomer((int)$customer_id);
 
-			if ($customer_info && !empty($customer_info['email']) && !empty($customer_info['newsletter'])) {
-				$this->unsubscribe($customer_info['email'], (int)$customer_info['store_id']);
+			if ($customer_info && !empty($customer_info['email'])) {
+				$this->anonymise($customer_info['email']);
 			}
 		}
 	}
@@ -1212,6 +1226,17 @@ class Newsman extends \Opencart\System\Engine\Controller {
 			$email_action = new \Newsman\Action\Subscribe\Email($this->registry);
 			$email_action->unsubscribe($email, $store_id);
 		} catch (\Exception $e) {
+			if ($this->registry->has('nzmlogger')) {
+				$this->nzmlogger->logException($e);
+			}
+		}
+	}
+
+	private function anonymise(string $email): void {
+		try {
+			$anonymise = new \Newsman\Action\Anonymise\Email($this->registry);
+			$anonymise->execute($email);
+		} catch (\Throwable $e) {
 			if ($this->registry->has('nzmlogger')) {
 				$this->nzmlogger->logException($e);
 			}
